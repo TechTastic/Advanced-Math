@@ -649,9 +649,6 @@ end
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 function fromVector(v, row)
     expect(1, v, "table")
-    if getmetatable(v).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Takes a vector!")
-    end
     expect(2, row, "boolean", "nil")
 
     row = row or true
@@ -675,6 +672,10 @@ end
 -- @treturn Matrix A new 3x3 rotation matrix
 -- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
 function fromQuaternion(q)
+    if not quaternion then
+        error("Quaternion API is not loaded!")
+    end
+
     expect(1, q, "table")
     if getmetatable(q).__index ~= getmetatable(quaternion.new()).__index then
         error("Invalid Argument! Takes a quaternion!")

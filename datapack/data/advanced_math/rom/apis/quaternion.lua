@@ -476,6 +476,11 @@ end
 --      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
 -- @usage q = quaternion.fromMatrix(m)
 function fromMatrix(m)
+    if not matrix then
+        error("Matrix API is not loaded!")
+    end
+    expect(1, m, "table")
+
     if getmetatable(m).__index ~= getmetatable(matrix.new()).__index then
         error("Invalid Argument! Takes a matrix!")
     end
@@ -521,7 +526,6 @@ function fromMatrix(m)
     return fromComponents(x, y, z, w)
 end
 
---- Deprecated: This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.
 function fromShip()
     error("This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.")
 end

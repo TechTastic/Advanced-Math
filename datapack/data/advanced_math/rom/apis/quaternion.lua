@@ -1,6 +1,3 @@
-local expect = require "cc.expect"
-local expect = expect.expect
-
 --- A basic quaternion type and some common quaternion operations. This may be useful
 -- when working with rotation in regards to physics (such as those from the
 -- @{ship} API).
@@ -19,6 +16,10 @@ local expect = expect.expect
 -- This is suitable for representing rotation.
 --
 -- @type Quaternion
+
+local expect = require "cc.expect"
+local expect = expect.expect
+
 local quaternion = {
 
     --- Adds two quaternions together. The resulting quaternion will not be normalized. If you want to add rotations together, use the mul function instead.

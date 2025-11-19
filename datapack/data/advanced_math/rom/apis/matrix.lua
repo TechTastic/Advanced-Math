@@ -1,6 +1,3 @@
-local expect = require "cc.expect"
-local expect = expect.expect
-
 --- A basic matrix type and common matrix operations. This may be useful
 -- when working with linear algebra, transformations, and mathematical computations.
 --
@@ -17,6 +14,10 @@ local expect = expect.expect
 -- and general numerical computations.
 --
 -- @type Matrix
+
+local expect = require "cc.expect"
+local expect = expect.expect
+
 local matrix = {
     --- Adds two matrices together, or adds a scalar to all elements.
     -- Supports broadcasting with row vectors and column vectors.

@@ -1,6 +1,3 @@
-local expect = require "cc.expect"
-local expect = expect.expect
-
 --- A basic PID type and common PID operations. This may be useful
 -- when working with control systems.
 --
@@ -10,6 +7,9 @@ local expect = expect.expect
 --
 -- @module pid
 -- @since 0.0.0
+
+local expect = require "cc.expect"
+local expect = expect.expect
 
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --
@@ -145,7 +145,7 @@ end
 --- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.
 --
 --
--- @type Matrix
+-- @type PID
 local pid = {
     --- Enables/disables the clamping of the output value
     --

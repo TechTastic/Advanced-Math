@@ -14,15 +14,17 @@ This project provides a few generic advanced mathematics libraries for CC: Tweak
 ## Installation
 
 If you want to add all libraries to your server or world, grab the datapack from the following sites:
+
 - [**CurseForge**](https://www.curseforge.com/minecraft/data-packs/cc-advanded-math)
+
 - [**Modrinth**](https://modrinth.com/datapack/cc-advanded-math)
 
 If you want specific library files, simply copy them into your in-game computer and, to use them, follow this:
-### Quaternions
+#### Quaternions
 `os.loadAPI("path/to/quaternion.lua")`
-### Matrices
+#### Matrices
 `os.loadAPI("path/to/matrix.lua")`
-### PID Controllers
+#### PID Controllers
 `local pid = require "path/to/pid"`
 
 ## License

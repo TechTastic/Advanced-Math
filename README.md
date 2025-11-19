@@ -6,7 +6,9 @@ Mathematical APIs for CC: Tweaked!
 
 This project provides a few generic advanced mathematics libraries for CC: Tweaked.  
 - [**Quaternions**](https://techtastic.github.io/Advanced-Math/modules/quaternion.html)  
+
 - [**Matrices**](https://techtastic.github.io/Advanced-Math/modules/matrix.html)  
+
 - [**PID Controllers**](https://techtastic.github.io/Advanced-Math/modules/pid.html)  
 
 [Here](https://github.com/TechTastic/Advanced-Math) is the actual repository of this project.

@@ -24,3 +24,7 @@ If you want specific library files, simply copy them into your in-game computer 
 `os.loadAPI("path/to/matrix.lua")`
 ### PID Controllers
 `local pid = require "path/to/pid"`
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file

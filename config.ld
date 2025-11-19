@@ -7,11 +7,10 @@ file = {
 }
 format = 'markdown'
 dir = 'docs'
-readme = 'README.md`
+readme = "README.md"
 
 no_return_or_parms = true
 
 topics = {
-    'README.md',
-    'LICENSE'
+    'README.md'
 }

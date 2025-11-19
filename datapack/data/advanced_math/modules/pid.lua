@@ -146,6 +146,15 @@ end
 --
 -- @type PID
 local pid = {
+    --- Performs a PID control step
+    -- @tparam PID self The PID instance
+    -- @tparam number|vector|quaternion value The current value being measured
+    -- @tparam number dt The time since the last step
+    -- @treturn number|vector|quaternion The control output
+    -- @usage output = pid:step(value)
+    -- @usage output = pid:step(value, 0.5)
+    step = function() end,  -- to be replaced in constructor
+
     --- Enables/disables the clamping of the output value
     --
     -- @tparam PID self The PID instance

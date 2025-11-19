@@ -6,7 +6,6 @@
 -- [wiki]: https://en.wikipedia.org/wiki/Matrix_(mathematics)
 --
 -- @module matrix
--- @since 0.0.0
 
 --- A matrix, with dimensions `rows` x `columns`.
 --

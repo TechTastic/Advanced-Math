@@ -6,7 +6,6 @@
 -- [wiki]: https://en.wikipedia.org/wiki/Proportional-integral-derivative_controller
 --
 -- @module pid
--- @since 0.0.0
 
 local expect = require "cc.expect"
 local expect = expect.expect

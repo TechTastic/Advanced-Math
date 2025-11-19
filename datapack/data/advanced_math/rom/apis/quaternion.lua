@@ -9,7 +9,6 @@
 -- Special thanks to getItemFromBlock and Shlomo for sharing their own quaternion handling code.
 --
 -- @module quaternion
--- @since 0.0.0
 
 --- A quaternion, with imaginary component `v` and real component `a`.
 --

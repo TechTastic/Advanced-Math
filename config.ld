@@ -7,9 +7,11 @@ file = {
 }
 format = 'markdown'
 dir = 'docs'
-
-custom_tags = {
-    { 'since', title='Since', format = function(text) return text end }
-}
+readme = 'README.md`
 
 no_return_or_parms = true
+
+topics = {
+    'README.md',
+    'LICENSE'
+}

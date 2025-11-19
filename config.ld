@@ -12,5 +12,6 @@ readme = "README.md"
 no_return_or_parms = true
 
 topics = {
-    'README.md'
+    'README.md',
+    'CHANGELOG.md'
 }

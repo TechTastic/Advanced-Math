@@ -1,0 +1,148 @@
+name: Release to Modrinth and CurseForge
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create ZIP from datapack folder
+      run: |
+        cd datapack
+        zip -r ../Advanced-Math-${{ steps.version.outputs.VERSION }}.zip .
+        cd ..
+    
+    - name: Upload to Modrinth
+      uses: Kir-Antipov/mc-publish@v3.3
+      with:
+        modrinth-id: YOUR_MODRINTH_PROJECT_ID
+        modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+        
+        files: Advanced-Math-${{ steps.version.outputs.VERSION }}.zip
+        
+        name: Advanced Math Library ${{ steps.version.outputs.VERSION }}
+        version: ${{ steps.version.outputs.VERSION }}
+        version-type: release
+        
+        loaders: |
+          datapack
+        
+        game-versions: |
+          1.13
+          1.13.1
+          1.13.2
+          1.14
+          1.14.1
+          1.14.2
+          1.14.3
+          1.14.4
+          1.15
+          1.15.1
+          1.15.2
+          1.16
+          1.16.1
+          1.16.2
+          1.16.3
+          1.16.4
+          1.16.5
+          1.17
+          1.17.1
+          1.18
+          1.18.1
+          1.18.2
+          1.19
+          1.19.1
+          1.19.2
+          1.19.3
+          1.19.4
+          1.20
+          1.20.1
+          1.20.2
+          1.20.3
+          1.20.4
+          1.20.5
+          1.20.6
+          1.21
+          1.21.1
+          1.21.2
+          1.21.3
+          1.21.4
+        
+        changelog-file: CHANGELOG.md
+    
+    - name: Upload to CurseForge
+      uses: Kir-Antipov/mc-publish@v3.3
+      with:
+        curseforge-id: YOUR_CURSEFORGE_PROJECT_ID
+        curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+        
+        files: Advanced-Math-${{ steps.version.outputs.VERSION }}.zip
+        
+        name: Advanced Math Library ${{ steps.version.outputs.VERSION }}
+        version: ${{ steps.version.outputs.VERSION }}
+        version-type: release
+        
+        loaders: |
+          datapack
+        
+        game-versions: |
+          1.13
+          1.13.1
+          1.13.2
+          1.14
+          1.14.1
+          1.14.2
+          1.14.3
+          1.14.4
+          1.15
+          1.15.1
+          1.15.2
+          1.16
+          1.16.1
+          1.16.2
+          1.16.3
+          1.16.4
+          1.16.5
+          1.17
+          1.17.1
+          1.18
+          1.18.1
+          1.18.2
+          1.19
+          1.19.1
+          1.19.2
+          1.19.3
+          1.19.4
+          1.20
+          1.20.1
+          1.20.2
+          1.20.3
+          1.20.4
+          1.20.5
+          1.20.6
+          1.21
+          1.21.1
+          1.21.2
+          1.21.3
+          1.21.4
+        
+        changelog-file: CHANGELOG.md

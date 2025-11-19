@@ -27,4 +27,4 @@ If you want specific library files, simply copy them into your in-game computer 
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file
+This project is licensed under the [MIT License](https://github.com/TechTastic/Advanced-Math/blob/main/LICENSE).

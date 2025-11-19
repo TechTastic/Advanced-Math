@@ -144,7 +144,6 @@ end
 
 --- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.
 --
---
 -- @type PID
 local pid = {
     --- Enables/disables the clamping of the output value

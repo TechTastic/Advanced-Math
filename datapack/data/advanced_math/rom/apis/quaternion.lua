@@ -1,6 +1,6 @@
 --- A basic quaternion type and some common quaternion operations. This may be useful
 -- when working with rotation in regards to physics (such as those from the
--- @{ship} API).
+-- Ship API provided by CC: VS).
 --
 -- An introduction to quaternions can be found on [Wikipedia][wiki].
 --
@@ -65,8 +65,8 @@ local quaternion = {
     --- Multiplies a quaternion by a scalar value, another quaternion, or a vector.
     --
     -- @tparam Quaternion self The quaternion to multiply
-    -- @tparam number, Quaternion, or Vector other The scalar value, quaternion, or vector to multiply with
-    -- @treturn Quaternion or Vector The resulting quaternion or rotated vector
+    -- @tparam number|Quaternion|Vector other The scalar value, quaternion, or vector to multiply with
+    -- @treturn Quaternion|Vector The resulting quaternion or rotated vector
     --      Note: If using a quaternion value, the resuulting quaternion will be the "addition" of the two rotations
     --      Note: If using a vector value, will rotate the vector by the quaternion
     --      Note: If using a scalar value, the resulting quaternion will not be normalized
@@ -110,7 +110,7 @@ local quaternion = {
     --- Divides a quaternion by a scalar or another quaternion.
     --
     -- @tparam Quaternion self The quaternion to divide
-    -- @tparam Quaternion or number other The quaternion or scalar number to divide with
+    -- @tparam Quaternion|number other The quaternion or scalar number to divide with
     -- @treturn Quaternion The resulting quaternion
     --      Note: If using a scalar value, the resulting quaternion will not be normalized
     -- @usage q1:div(q2)

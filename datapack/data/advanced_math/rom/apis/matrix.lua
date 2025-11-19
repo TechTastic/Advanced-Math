@@ -23,7 +23,7 @@ local matrix = {
     -- Supports broadcasting with row vectors and column vectors.
     --
     -- @tparam Matrix self The first matrix to add
-    -- @tparam Matrix, number other The second matrix, scalar, or vector to add
+    -- @tparam Matrix|number other The second matrix, scalar, or vector to add
     -- @treturn Matrix The resulting matrix
     -- @usage m1:add(m2)
     -- @usage m1 + m2
@@ -62,7 +62,7 @@ local matrix = {
     --- Subtracts two matrices, or subtracts a scalar from all elements.
     --
     -- @tparam Matrix self The matrix to subtract from
-    -- @tparam Matrix, number other The matrix or scalar to subtract
+    -- @tparam Matrix|number other The matrix or scalar to subtract
     -- @treturn Matrix The resulting matrix
     -- @usage m1:sub(m2)
     -- @usage m1 - m2
@@ -73,7 +73,7 @@ local matrix = {
     --- Multiplies a matrix by a scalar or performs matrix multiplication.
     --
     -- @tparam Matrix self The matrix to multiply
-    -- @tparam Matrix, number other The scalar or matrix to multiply with
+    -- @tparam Matrix|number other The scalar or matrix to multiply with
     -- @treturn Matrix The resulting matrix
     --      Note: For matrix multiplication, the number of columns in self must equal the number of rows in other
     -- @usage m:mul(3)
@@ -110,7 +110,7 @@ local matrix = {
     --- Divides a matrix by a scalar or another matrix.
     --
     -- @tparam Matrix self The matrix to divide
-    -- @tparam Matrix, number other The scalar or matrix to divide by
+    -- @tparam Matrix|number other The scalar or matrix to divide by
     -- @treturn Matrix The resulting matrix
     --      Note: Division by a matrix is performed by multiplying by its inverse
     -- @usage m:div(2)
@@ -595,6 +595,15 @@ local metatable = {
     __eq = matrix.equals
 }
 
+--- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
+--
+-- @tparam number rows The number of rows in the matrix
+-- @tparam number columns The number of columns in the matrix
+-- @tparam function|number|nil func A function taking (row, column) to generate values, or a scalar to fill all elements
+-- @treturn Matrix A new matrix
+-- @usage m = matrix.new(3, 3, function(r, c) return r + c end)
+-- @usage m = matrix.new(2, 4, 5) -- fills all elements with 5
+-- @usage m = matrix.new(2, 2) -- fills all elements with 1
 function new(rows, columns, func)
     expect(1, rows, "number", "nil")
     expect(2, columns, "number", "nil")
@@ -618,6 +627,11 @@ function new(rows, columns, func)
     return setmetatable(m, metatable)
 end
 
+--- Constructs a matrix from a 2D array (table of tables).
+--
+-- @tparam table arr A 2D array representing the matrix data
+-- @treturn Matrix A new matrix
+-- @usage m = matrix.from2DArray({{1, 2}, {3, 4}})
 function from2DArray(arr)
     expect(1, arr, "table")
     if getmetatable(arr) ~= nil then
@@ -627,6 +641,13 @@ function from2DArray(arr)
     return new(#arr, #arr[1], function(r, c) return arr[r][c] or 0 end)
 end
 
+--- Constructs a matrix from a vector, as either a row or column matrix.
+--
+-- @tparam table v The vector to convert
+-- @tparam boolean row Whether to create a row matrix (true) or column matrix (false). Defaults to true.
+-- @treturn Matrix A new matrix representing the vector
+-- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
+-- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 function fromVector(v, row)
     expect(1, v, "table")
     if getmetatable(v).__index ~= getmetatable(vector.new()).__index then
@@ -649,6 +670,11 @@ function fromVector(v, row)
     return from2DArray(m)
 end
 
+--- Constructs a rotation matrix from a quaternion.
+--
+-- @tparam table q The quaternion to convert
+-- @treturn Matrix A new 3x3 rotation matrix
+-- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
 function fromQuaternion(q)
     expect(1, q, "table")
     if getmetatable(q).__index ~= getmetatable(quaternion.new()).__index then
@@ -669,6 +695,12 @@ function fromQuaternion(q)
     return from2DArray(m)
 end
 
+--- Constructs an identity matrix of given dimensions.
+--
+-- @tparam number rows The number of rows
+-- @tparam number columns The number of columns
+-- @treturn Matrix A new identity matrix
+-- @usage m = matrix.identity(3, 3)
 function identity(rows, columns)
     return new(rows, columns)
 end

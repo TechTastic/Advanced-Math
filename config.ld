@@ -7,3 +7,9 @@ file = {
 }
 format = 'markdown'
 dir = 'docs'
+
+custom_tags = {
+    { 'since', title='Since', format = function(text) return text end }
+}
+
+no_return_or_parms = true

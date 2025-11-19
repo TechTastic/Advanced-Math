@@ -368,6 +368,8 @@ local vmetatable = {
     __eq = quaternion.equals,
 }
 
+-- @section Constructors
+
 --- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
 --
 -- @tparam Vector vec imaginary component of the vector, stored in a vector

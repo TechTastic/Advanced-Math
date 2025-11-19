@@ -594,6 +594,8 @@ local metatable = {
     __eq = matrix.equals
 }
 
+-- @section Constructors
+
 --- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
 --
 -- @tparam number rows The number of rows in the matrix

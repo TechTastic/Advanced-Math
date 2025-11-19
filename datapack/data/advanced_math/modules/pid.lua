@@ -209,6 +209,8 @@ local metatable = {
     __tostring = pid.tostring
 }
 
+-- @section Constructors
+
 --- Constructs a new PID controller for either a scalar, vector, or quaternion target.
 --
 -- @tparam number|vector|quaternion target The setpoint to reach

@@ -1,6 +1,16 @@
 local expect = require "cc.expect"
 local expect = expect.expect
 
+--- A basic PID type and common PID operations. This may be useful
+-- when working with control systems.
+--
+-- An introduction to PIDs can be found on [Wikipedia][wiki].
+--
+-- [wiki]: https://en.wikipedia.org/wiki/Proportional-integral-derivative_controller
+--
+-- @module pid
+-- @since 0.0.0
+
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --
 -- @tparam pid self The PID instance
@@ -132,6 +142,10 @@ local function quaternionStep(self, value, dt)
     return output
 end
 
+--- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.
+--
+--
+-- @type Matrix
 local pid = {
     --- Enables/disables the clamping of the output value
     --

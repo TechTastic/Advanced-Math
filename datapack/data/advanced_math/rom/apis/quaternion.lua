@@ -1,3 +1,6 @@
+local expect = require "cc.expect"
+local expect = expect.expect
+
 --- A basic quaternion type and some common quaternion operations. This may be useful
 -- when working with rotation in regards to physics (such as those from the
 -- @{ship} API).
@@ -9,7 +12,7 @@
 -- Special thanks to getItemFromBlock and Shlomo for sharing their own quaternion handling code.
 --
 -- @module quaternion
--- @since 0.3.0
+-- @since 0.0.0
 
 --- A quaternion, with imaginary component `v` and real component `a`.
 --
@@ -26,6 +29,9 @@ local quaternion = {
     -- @usage q1:add(q2)
     -- @usage q1 + q2
     add = function(self, other)
+        expect(1, self, "table")
+        expect(2, other, "table")
+
         if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
             error("Invalid Argument! Takes another quaternion!")
         end
@@ -43,6 +49,9 @@ local quaternion = {
     -- @usage q1:sub(q2)
     -- @usage q1 - q2
     sub = function(self, other)
+        expect(1, self, "table")
+        expect(2, other, "table")
+
         if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
             error("Invalid Argument! Takes another quaternion!")
         end
@@ -67,6 +76,13 @@ local quaternion = {
     -- @usage q:mul(v)
     -- @usage q * v
     mul = function(self, other)
+        expect(1, self, "table", "number")
+        expect(2, other, "table", "number")
+
+        if type(self) == "number" or (type(self) == "table" and getmetatable(self).__index == getmetatable(vector.new()).__index) then
+            return other * self
+        end
+
         if type(other) == "table" then
             if getmetatable(other).__index == getmetatable(self).__index then
                 -- Quaternion * Quaternion
@@ -74,13 +90,12 @@ local quaternion = {
                     other.v * self.a + self.v * other.a + self.v:cross(other.v),
                     self.a * other.a + -(self.v:dot(other.v))
                 ):normalize()
-            else
+            elseif getmetatable(other).__index == getmetatable(vector.new()).__index then
                 -- Quaternion * Vector
                 m_q = quaternion.new(other, 0)
                 return (self * m_q * self:conjugate()).v
             end
-        end
-        if type(other) == "number" then
+        elseif type(other) == "number" then
             -- Quaternion * Scalar
             return quaternion.new(
                 self.v * other,
@@ -102,6 +117,13 @@ local quaternion = {
     -- @usage q:div(2)
     -- @usage q / 2
     div = function(self, other)
+        expect(1, self, "table", "number")
+        expect(2, other, "table", "number")
+
+        if type(self) == "number" then
+            return other * (1 / self)
+        end
+
         if type(other) == "table" and getmetatable(other).__index == getmetatable(self).__index then
             return self * other:inverse()
         end
@@ -157,6 +179,9 @@ local quaternion = {
     -- @usage q1:equals(q2)
     -- @usage q1 == q2
     equals = function(self, other)
+        expect(1, self, "table")
+        expect(2, other, "table")
+
         if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
             error("Invalid Argument! Takes another quaternion!")
         end
@@ -202,6 +227,10 @@ local quaternion = {
     -- @treturn Quaternion The resulting quaternion
     -- @usage q1:slerp(q2, alpha)
 	slerp = function(self, other, alpha)
+        expect(1, self, "table")
+        expect(2, other, "table")
+        expect(3, alpha, "number")
+
         if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index or type(alpha) ~= "number" then
             error("Invalid Arguments! Takes a target quaternion and an alpha number!")
         end
@@ -346,6 +375,12 @@ local vmetatable = {
 -- @treturn The quaternion made from the given arguments
 -- @usage q = quaternion.new(vec, w)
 function new(vec, w)
+    expect(1, vec, "table", "nil")
+    expect(2, w, "number", "nil")
+    if vec and getmetatable(vec).__index ~= getmetatable(vector.new()).__index then
+        error("Invalid Argument! Takes a vector or nil!")
+    end
+
 	return setmetatable({
         v = vec or vector.new(),
         a = tonumber(w) or 1,
@@ -359,6 +394,15 @@ end
 -- @treturn The quaternion representing the rotation described by the axis angle parameters
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
 function fromAxisAngle(axis, angle)
+    expect(1, axis, "table", "nil")
+    expect(2, angle, "number", "nil")
+    if axis and getmetatable(axis).__index ~= getmetatable(vector.new()).__index then
+        error("Invalid Argument! Takes a vector or nil!")
+    end
+    if angle and type(angle) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+
     if not axis then
         axis = vector.new()
     else
@@ -377,6 +421,19 @@ end
 -- @treturn the quaternion made from the provided euler angles
 -- @usage q = quaternion.fromEuler(pitch, yaw, roll)
 function fromEuler(pitch, yaw, roll)
+    expect(1, pitch, "number", "nil")
+    expect(2, yaw, "number", "nil")
+    expect(3, roll, "number", "nil")
+    if pitch and type(pitch) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+    if yaw and type(yaw) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+    if roll and type(roll) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+
     pitch = pitch or 0
     yaw = yaw or 0
     roll = roll or 0
@@ -392,21 +449,81 @@ end
 -- @treturn the quaternion made from the provided components
 -- @usage q = quaternion.fromComponents(x, y, z, w)
 function fromComponents(x, y, z, w)
+    expect(1, x, "number", "nil")
+    expect(2, y, "number", "nil")
+    expect(3, z, "number", "nil")
+    expect(4, w, "number", "nil")
+    if x and type(x) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+    if y and type(y) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+    if z and type(z) ~= "number" then
+        error("Invalid Argument! Takes a number or nil!")
+    end
+
     x = x or 0
     y = y or 0
     z = z or 0
     return new(vector.new(x, y, z), w)
 end
 
---- Constructs a new quaternion from the computer's ship orientation. Will throw an error if the ship API is not available.
+--- Constructs a new quaternion from a 3x3 rotation matrix or 4x4 transformation matrix.
 --
--- @treturn the quaternion representing the ship's orientation
--- @usage q = quaternion.fromShip()
-function fromShip()
-    if not ship then
-        error("This method requires the ship API added by CC: VS!")
+-- @tparam Matrix m The rotation matrix to convert (3x3 or 4x4)
+-- @treturn Quaternion The quaternion representing the same rotation
+--      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
+-- @usage q = quaternion.fromMatrix(m)
+function fromMatrix(m)
+    if getmetatable(m).__index ~= getmetatable(matrix.new()).__index then
+        error("Invalid Argument! Takes a matrix!")
     end
-    return ship.getQuaternion()
+    
+    if (m.rows ~= 3 or m.columns ~= 3) and (m.rows ~= 4 or m.columns ~= 4) then
+        error("Matrix must be 3x3 or 4x4!")
+    end
+    
+    if m.rows == 4 then
+        m = m:minor(4, 4)
+    end
+    
+    local trace = m:trace()
+    
+    local w, x, y, z
+    
+    if trace > 0 then
+        local s = math.sqrt(trace + 1.0) * 2
+        w = 0.25 * s
+        x = (m[3][2] - m[2][3]) / s
+        y = (m[1][3] - m[3][1]) / s
+        z = (m[2][1] - m[1][2]) / s
+    elseif m[1][1] > m[2][2] and m[1][1] > m[3][3] then
+        local s = math.sqrt(1.0 + m[1][1] - m[2][2] - m[3][3]) * 2
+        w = (m[3][2] - m[2][3]) / s
+        x = 0.25 * s
+        y = (m[1][2] + m[2][1]) / s
+        z = (m[1][3] + m[3][1]) / s
+    elseif m[2][2] > m[3][3] then
+        local s = math.sqrt(1.0 + m[2][2] - m[1][1] - m[3][3]) * 2
+        w = (m[1][3] - m[3][1]) / s
+        x = (m[1][2] + m[2][1]) / s
+        y = 0.25 * s
+        z = (m[2][3] + m[3][2]) / s
+    else
+        local s = math.sqrt(1.0 + m[3][3] - m[1][1] - m[2][2]) * 2
+        w = (m[2][1] - m[1][2]) / s
+        x = (m[1][3] + m[3][1]) / s
+        y = (m[2][3] + m[3][2]) / s
+        z = 0.25 * s
+    end
+    
+    return fromComponents(x, y, z, w)
+end
+
+--- Deprecated: This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.
+function fromShip()
+    error("This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.")
 end
 
 --- Constructs a new identity quaternion, representing an empty rotation.

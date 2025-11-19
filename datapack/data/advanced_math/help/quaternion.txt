@@ -3,8 +3,11 @@ quaternion.new( vector, w )
 quaternion.fromAxisAngle( axis, angle )
 quaternion.fromEuler( pitch, yaw, roll )
 quaternion.fromComponents( x, y, z, w )
-quaternion.fromShip()
+quaternion.fromMatrix()
 quaternion.identity()
+
+Deprecated Functions:
+quaternion.fromShip()
 
 Quaternions returned by the above methods have the following fields and methods:
 quaternion.v

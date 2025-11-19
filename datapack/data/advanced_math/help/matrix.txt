@@ -1,1 +1,40 @@
-WIP
+Functions in the Matrix Math API:
+matrix.new( rows, columns, func )
+matrix.from2DArray( arr )
+matrix.fromVector( vector, row )
+matrix.fromQuaternion( quaternion )
+matrix.identity( rows, columns )
+
+Matrices returned by the above methods have the following fields and methods:
+matrix.rows
+matrix.columns
+matrix:add( matrix or scalar )
+matrix:sub( matrix or scalar )
+matrix:mul( matrix or scalar )
+matrix:div( matrix or scalar )
+matrix:unm()
+matrix:pow( n )
+matrix:tostring()
+matrix:equals( matrix )
+matrix:minor( row, column )
+matrix:determinant()
+matrix:transpose()
+matrix:cofactor()
+matrix:adjugate()
+matrix:inverse()
+matrix:trace()
+matrix:rank()
+matrix:frobenius_norm()
+matrix:max_norm()
+matrix:hadamard_product( matrix )
+matrix:elementwise_div( matrix )
+matrix:is_symmetric()
+matrix:is_diagonal()
+matrix:is_identity()
+matrix:clone()
+matrix:length()
+The +, -, *, /, ^, and # operators can also be used on matrices.
+
+Note: When using a scalar value with add or mul, the operation is applied element-wise to all matrix elements.
+Note: Matrix division by another matrix is performed by multiplying by the inverse.
+Note: The pow operator requires a square matrix and a non-negative integer exponent.

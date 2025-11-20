@@ -1,25 +1,30 @@
 @media (prefers-color-scheme: dark) {
   html {
     background-color: #1e1e1e !important;
+    min-height: 100%;
   }
   
   body {
     background-color: #1e1e1e !important;
     color: #d4d4d4 !important;
+    min-height: 100vh;
   }
   
   #container {
     background-color: #1e1e1e !important;
+    min-height: 100vh;
   }
   
   #content {
     background-color: #252526 !important;
     color: #d4d4d4 !important;
+    min-height: 100vh;
   }
   
   #main {
     background-color: #252526 !important;
     color: #d4d4d4 !important;
+    min-height: 100vh;
   }
   
   div, section, article {

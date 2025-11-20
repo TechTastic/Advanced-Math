@@ -41,6 +41,7 @@ end
 -- @treturn The quaternion representing the rotation described by the axis angle parameters
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
 -- @export
+-- @see https://tweaked.cc/module/vector.html vector
 function fromAxisAngle(axis, angle)
     expect(1, axis, "Vector", "nil")
     expect(2, angle, "number", "nil")
@@ -177,6 +178,7 @@ local quaternion = {
     --- The imaginary component of the quaternion, stored in a vector.
     -- @field v
     -- @tparam Vector v
+    -- @see https://tweaked.cc/module/vector.html vector
 
     --- The real component of the quaternion.
     -- @field a
@@ -230,6 +232,7 @@ local quaternion = {
     -- @usage q1 * q2
     -- @usage q:mul(v)
     -- @usage q * v
+    -- @see https://tweaked.cc/module/vector.html vector
     mul = function(self, other)
         expect(1, self, "Quaternion", "Vector", "number")
         expect(2, other, "Quaternion", "Vector", "number")
@@ -421,6 +424,7 @@ local quaternion = {
     -- @tparam Quaternion self The quaternion to use as a rotation source
     -- @treturn Vector The resulting axis
     -- @usage q:getAxis()
+    -- @see https://tweaked.cc/module/vector.html vector
     getAxis = function(self)
         self = self:normalize()
         local factor = math.sqrt(1 - self.a * self.a)

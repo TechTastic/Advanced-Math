@@ -25,6 +25,7 @@ local expect = expect.expect
 -- @usage pid = pid.new(target)
 -- @export
 -- @see quaternion
+-- @see https://tweaked.cc/module/vector.html vector
 function new(target, p, i, d, discrete)
     expect(1, target, "number", "Vector", "Quaternion")
     expect(2, p, "number", "nil")
@@ -103,6 +104,7 @@ end
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
 -- @local
+-- @see https://tweaked.cc/module/vector.html vector
 local function vectorStep(self, value, dt)
     expect(1, value, "Vector")
     expect(2, dt, "number", "nil")
@@ -193,6 +195,8 @@ local pid = {
     --- The setpoint to reach
     -- @field sp
     -- @tparam number|vector|quaternion sp
+    -- @see https://tweaked.cc/module/vector.html vector
+    -- @see quaternion
 
     --- The proportional gain - how aggressively to respond to the current error
     -- @field kp
@@ -213,6 +217,7 @@ local pid = {
     -- @treturn number|vector|quaternion The control output
     -- @usage output = pid:step(value)
     -- @usage output = pid:step(value, 0.5)
+    -- @see https://tweaked.cc/module/vector.html vector
     -- @see quaternion
     step = function() end,  -- to be replaced in constructor
 

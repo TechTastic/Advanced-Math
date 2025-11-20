@@ -67,6 +67,7 @@ end
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 -- @export
+-- @see https://tweaked.cc/module/vector.html vector
 function fromVector(v, row)
     expect(1, v, "Vector")
     expect(2, row, "boolean", "nil")

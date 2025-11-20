@@ -17,4 +17,3 @@ topics = {
 }
 
 one = true
-custom_css = 'ldoc-dark.css'

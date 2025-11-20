@@ -192,10 +192,9 @@ end
 --
 -- @type PID
 local pid = {
-    --- The setpoint to reach
+    --- The setpoint to reach. Uses [Vector][https://tweaked.cc/module/vector.html] or Quaternion types when applicable.
     -- @field sp
     -- @tparam number|vector|quaternion sp
-    -- @see https://tweaked.cc/module/vector.html vector
     -- @see quaternion
 
     --- The proportional gain - how aggressively to respond to the current error
@@ -211,13 +210,13 @@ local pid = {
     -- @tparam number kd
 
     --- Performs a PID control step
+    -- Uses [Vector][https://tweaked.cc/module/vector.html] or Quaternion types when applicable.
     -- @tparam PID self The PID instance
     -- @tparam number|vector|quaternion value The current value being measured
     -- @tparam number dt The time since the last step
     -- @treturn number|vector|quaternion The control output
     -- @usage output = pid:step(value)
     -- @usage output = pid:step(value, 0.5)
-    -- @see https://tweaked.cc/module/vector.html vector
     -- @see quaternion
     step = function() end,  -- to be replaced in constructor
 

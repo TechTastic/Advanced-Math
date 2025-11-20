@@ -16,7 +16,7 @@
 
 --- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
 --
--- @tparam Vector vec imaginary component of the vector, stored in a vector
+-- @tparam Vector vec imaginary component of the vector, stored in a vector. Uses [Vector][https://tweaked.cc/module/vector.html] type
 -- @tparam number w Real component of the quaternion
 -- @treturn The quaternion made from the given arguments
 -- @usage q = quaternion.new(vec, w)
@@ -36,12 +36,11 @@ end
 
 --- Constructs a new quaternion from the provided axis - angle parameters. The resulting quaternion is already normalized.
 --
--- @tparam Vector axis Rotation axis that will be used for the quaternion. The axis does not need to be normalized
+-- @tparam Vector axis Rotation axis that will be used for the quaternion. The axis does not need to be normalized. Uses [Vector][https://tweaked.cc/module/vector.html] type
 -- @tparam number angle Angle in radians of the rotation
 -- @treturn The quaternion representing the rotation described by the axis angle parameters
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
 -- @export
--- @see https://tweaked.cc/module/vector.html vector
 function fromAxisAngle(axis, angle)
     expect(1, axis, "Vector", "nil")
     expect(2, angle, "number", "nil")
@@ -175,10 +174,9 @@ local expect = require "cc.expect"
 local expect = expect.expect
 
 local quaternion = {
-    --- The imaginary component of the quaternion, stored in a vector.
+    --- The imaginary component of the quaternion, stored in a [Vector][https://tweaked.cc/module/vector.html].
     -- @field v
     -- @tparam Vector v
-    -- @see https://tweaked.cc/module/vector.html vector
 
     --- The real component of the quaternion.
     -- @field a
@@ -218,7 +216,7 @@ local quaternion = {
         )
     end,
 
-    --- Multiplies a quaternion by a scalar value, another quaternion, or a vector.
+    --- Multiplies a quaternion by a scalar value, another quaternion, or a [Vector][https://tweaked.cc/module/vector.html].
     --
     -- @tparam Quaternion self The quaternion to multiply
     -- @tparam number|Quaternion|Vector other The scalar value, quaternion, or vector to multiply with
@@ -232,7 +230,6 @@ local quaternion = {
     -- @usage q1 * q2
     -- @usage q:mul(v)
     -- @usage q * v
-    -- @see https://tweaked.cc/module/vector.html vector
     mul = function(self, other)
         expect(1, self, "Quaternion", "Vector", "number")
         expect(2, other, "Quaternion", "Vector", "number")
@@ -419,12 +416,11 @@ local quaternion = {
         return 2 * math.acos(self.a)
     end,
 
-    --- Gets the normalized axis of rotation corresponding to the rotation defined by the given quaternion.
+    --- Gets the normalized axis of rotation corresponding to the rotation defined by the given quaternion. Uses [Vector][https://tweaked.cc/module/vector.html] type.
     --
     -- @tparam Quaternion self The quaternion to use as a rotation source
     -- @treturn Vector The resulting axis
     -- @usage q:getAxis()
-    -- @see https://tweaked.cc/module/vector.html vector
     getAxis = function(self)
         self = self:normalize()
         local factor = math.sqrt(1 - self.a * self.a)

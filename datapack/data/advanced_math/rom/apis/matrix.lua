@@ -59,7 +59,7 @@ function from2DArray(arr)
     return new(#arr, #arr[1], function(r, c) return arr[r][c] or 0 end)
 end
 
---- Constructs a matrix from a vector, as either a row or column matrix.
+--- Constructs a matrix from a [Vector][https://tweaked.cc/module/vector.html], as either a row or column matrix.
 --
 -- @tparam table v The vector to convert
 -- @tparam boolean row Whether to create a row matrix (true) or column matrix (false). Defaults to true.
@@ -67,7 +67,6 @@ end
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 -- @export
--- @see https://tweaked.cc/module/vector.html vector
 function fromVector(v, row)
     expect(1, v, "Vector")
     expect(2, row, "boolean", "nil")

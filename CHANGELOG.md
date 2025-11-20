@@ -1,2 +1,2 @@
-# Changelog - 0.1.2
-- Swapped `require` for `dofile` in the APIs
+# Changelog - 0.1.3
+- Fixed path to `pid.lua`

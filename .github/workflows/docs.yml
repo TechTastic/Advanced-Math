@@ -23,7 +23,7 @@ jobs:
     - name: Install ldoc-custom and styles
       run: |
         git clone https://github.com/sontungexpt/ldoc-css-styles.git && cd ldoc-css-styles
-        cp ldoc-custom /usr/bin/
+        sudo cp ldoc-custom /usr/bin/
         cd ..
     
     - name: Install LDoc

@@ -30,7 +30,7 @@ jobs:
       run: sudo luarocks install ldoc
     
     - name: Generate Documentation
-      run: ldoc .
+      run: ldoc-custom .
     
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3

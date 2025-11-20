@@ -1,2 +1,2 @@
-# Changelog - 0.1.3
-- Fixed path to `pid.lua`
+# Changelog - 0.1.4
+- Fixed `__name` references

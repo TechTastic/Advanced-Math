@@ -70,7 +70,7 @@ end
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 -- @export
 function fromVector(v, row)
-    expect(1, v, "Vector")
+    expect(1, v, "vector")
     expect(2, row, "boolean", "nil")
 
     row = row or true
@@ -96,7 +96,7 @@ function fromQuaternion(q)
     if not quaternion then
         error("Quaternion API is not loaded!")
     end
-    expect(1, q, "Quaternion")
+    expect(1, q, "quaternion")
 
     q = q:normalize()
     local w = q.a
@@ -148,8 +148,8 @@ local matrix = {
     -- @usage m1 + m2
     -- @usage m + 5
     add = function(self, other)
-        expect(1, self, "number", "Matrix")
-        expect(2, other, "number", "Matrix")
+        expect(1, self, "number", "matrix")
+        expect(2, other, "number", "matrix")
 
         if type(self) == "number" then
             return other + self
@@ -200,8 +200,8 @@ local matrix = {
     -- @usage m1:mul(m2)
     -- @usage m1 * m2
     mul = function(self, other)
-        expect(1, self, "number", "Matrix")
-        expect(2, other, "number", "Matrix")
+        expect(1, self, "number", "matrix")
+        expect(2, other, "number", "matrix")
 
         if type(self) == "number" then
             return other * self
@@ -237,8 +237,8 @@ local matrix = {
     -- @usage m1:div(m2)
     -- @usage m1 / m2
     div = function(self, other)
-        expect(1, self, "number", "Matrix")
-        expect(2, other, "number", "Matrix")
+        expect(1, self, "number", "matrix")
+        expect(2, other, "number", "matrix")
 
         if type(self) == "number" then
             return self * other:inverse()
@@ -342,8 +342,8 @@ local matrix = {
     -- @usage m1:equals(m2)
     -- @usage m1 == m2
     equals = function(self, other)
-        expect(1, self, "Matrix")
-        expect(2, other, "Matrix")
+        expect(1, self, "matrix")
+        expect(2, other, "matrix")
 
         if type(self) == type(other) and self.rows == other.rows and self.columns == other.columns then
             local identical = true
@@ -595,8 +595,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:hadamard_product(m2)
     hadamard_product = function(self, other)
-        expect(1, self, "Matrix")
-        expect(2, other, "Matrix")
+        expect(1, self, "matrix")
+        expect(2, other, "matrix")
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise multiplication!")
@@ -618,8 +618,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:elementwise_div(m2)
     elementwise_div = function(self, other)
-        expect(1, self, "Matrix")
-        expect(2, other, "Matrix")
+        expect(1, self, "matrix")
+        expect(2, other, "matrix")
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise division!")
@@ -702,7 +702,7 @@ local matrix = {
 }
 
 local metatable = {
-    __name = "Matrix",
+    __name = "matrix",
     __index = matrix,
     __add = matrix.add,
     __sub = matrix.sub,

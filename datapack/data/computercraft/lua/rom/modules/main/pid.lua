@@ -27,7 +27,11 @@ local expect = expect.expect
 -- @see quaternion
 -- @see https://tweaked.cc/module/vector.html vector
 function new(target, p, i, d, discrete)
-    expect(1, target, "number", "vector", "quaternion")
+    expect(1, target, "table", "number")
+
+    if type(target) == "table" and getmetatable(target).__name ~= "vector" and getmetatable(target).__name ~= "quaternion" then
+        expect(1, target, "vector", "quaternion", "number")
+    end
     expect(2, p, "number", "nil")
     expect(3, i, "number", "nil")
     expect(4, d, "number", "nil")
@@ -106,7 +110,8 @@ end
 -- @local
 -- @see https://tweaked.cc/module/vector.html vector
 local function vectorStep(self, value, dt)
-    expect(1, value, "vector")
+    expect(1, value, "table")
+    if getmetatable(value) ~= getmetatable(vector.new()) then expect(1, value, "vector") end
     expect(2, dt, "number", "nil")
     dt = dt or 1
 
@@ -152,7 +157,8 @@ end
 -- @local
 -- @see quaternion
 local function quaternionStep(self, value, dt)
-    expect(1, value, "quaternion")
+    expect(1, value, "table")
+    if getmetatable(value).__name ~= "quaternion" then expect(1, value, "quaternion") end
     expect(2, dt, "number", "nil")
     dt = dt or 1
 

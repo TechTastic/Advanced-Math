@@ -1,2 +1,2 @@
-# Changelog - 0.1.4
-- Fixed `__name` references
+# Changelog - 0.1.5
+- CC: Tweaked cheated, fixing my `expect` calls

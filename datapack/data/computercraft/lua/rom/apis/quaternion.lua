@@ -24,11 +24,9 @@ local expect = dofile("rom/modules/main/cc/expect.lua").expect
 -- @usage q = quaternion.new(vec, w)
 -- @export
 function new(vec, w)
-    expect(1, vec, "vector", "nil")
+    expect(1, vec, "table", "nil")
+    if type(vec) == "table" and getmetatable(vec) ~= getmetatable(vector.new()) then expect(1, vec, "vector", "nil") end
     expect(2, w, "number", "nil")
-    if vec and getmetatable(vec).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Takes a vector or nil!")
-    end
 
 	return setmetatable({
         v = vec or vector.new(),
@@ -44,7 +42,8 @@ end
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
 -- @export
 function fromAxisAngle(axis, angle)
-    expect(1, axis, "vector", "nil")
+    expect(1, axis, "table", "nil")
+    if type(axis) == "table" and getmetatable(axis) ~= getmetatable(vector.new()) then expect(1, axis, "vector", "nil") end
     expect(2, angle, "number", "nil")
 
     if not axis then
@@ -110,7 +109,7 @@ function fromMatrix(m)
     if not matrix then
         error("Matrix API is not loaded!")
     end
-    expect(1, m, "matrix")
+    if getmetatable(m).__name ~= "matrix" then expect(1, m, "matrix") end
     
     if (m.rows ~= 3 or m.columns ~= 3) and (m.rows ~= 4 or m.columns ~= 4) then
         error("Matrix must be 3x3 or 4x4!")
@@ -188,8 +187,10 @@ local quaternion = {
     -- @usage q1:add(q2)
     -- @usage q1 + q2
     add = function(self, other)
-        expect(1, self, "quaternion")
-        expect(2, other, "quaternion")
+        expect(1, self, "table")
+        if getmetatable(self) ~= vmetatable then expect(1, self, "quaternion") end
+        expect(2, other, "table")
+        if getmetatable(other) ~= vmetatable then expect(2, other, "quaternion") end
 
         return quaternion.new(
             self.v:add(other.v),
@@ -205,8 +206,10 @@ local quaternion = {
     -- @usage q1:sub(q2)
     -- @usage q1 - q2
     sub = function(self, other)
-        expect(1, self, "quaternion")
-        expect(2, other, "quaternion")
+        expect(1, self, "table")
+        if getmetatable(self) ~= vmetatable then expect(1, self, "quaternion") end
+        expect(2, other, "table")
+        if getmetatable(other) ~= vmetatable then expect(2, other, "quaternion") end
 
         return quaternion.new(
             self.v:sub(other.v),
@@ -229,8 +232,10 @@ local quaternion = {
     -- @usage q:mul(v)
     -- @usage q * v
     mul = function(self, other)
-        expect(1, self, "quaternion", "vector", "number")
-        expect(2, other, "quaternion", "vector", "number")
+        expect(1, self, "table", "number")
+        if type(self) == "table" and getmetatable(self) ~= vmetatable and getmetatable(self) ~= getmetatable(vector.new()) then expect(1, self, "quaternion", "vector", "number") end
+        expect(2, other, "table", "number")
+        if type(other) == "table" and getmetatable(other) ~= vmetatable and getmetatable(other) ~= getmetatable(vector.new()) then expect(1, other, "quaternion", "vector", "number") end
 
         if type(self) == "number" or getmetatable(self).__name == "vector" then
             return other * self
@@ -270,8 +275,10 @@ local quaternion = {
     -- @usage q:div(2)
     -- @usage q / 2
     div = function(self, other)
-        expect(1, self, "quaternion", "number")
-        expect(2, other, "quaternion", "number")
+        expect(1, self, "table", "number")
+        if type(self) == "table" and getmetatable(self) ~= vmetatable then expect(1, self, "quaternion", "number") end
+        expect(2, other, "table", "number")
+        if type(self) == "table" and getmetatable(other) ~= vmetatable then expect(2, other, "quaternion", "number") end
 
         if type(self) == "number" then
             return other * (1 / self)
@@ -332,8 +339,10 @@ local quaternion = {
     -- @usage q1:equals(q2)
     -- @usage q1 == q2
     equals = function(self, other)
-        expect(1, self, "quaternion")
-        expect(2, other, "quaternion")
+        expect(1, self, "table")
+        if getmetatable(self) ~= vmetatable then expect(1, self, "quaternion") end
+        expect(2, other, "table")
+        if getmetatable(other) ~= vmetatable then expect(2, other, "quaternion") end
 
         return self.v == other.v and self.a == other.a
     end,
@@ -377,8 +386,10 @@ local quaternion = {
     -- @treturn Quaternion The resulting quaternion
     -- @usage q1:slerp(q2, alpha)
 	slerp = function(self, other, alpha)
-        expect(1, self, "quaternion")
-        expect(2, other, "quaternion")
+        expect(1, self, "table")
+        if getmetatable(self) ~= vmetatable then expect(1, self, "quaternion") end
+        expect(2, other, "table")
+        if getmetatable(other) ~= vmetatable then expect(2, other, "quaternion") end
         expect(3, alpha, "number")
 
         local a = self:copy()

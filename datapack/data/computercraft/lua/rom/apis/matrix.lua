@@ -54,7 +54,7 @@ end
 -- @export
 function from2DArray(arr)
     expect(1, arr, "table")
-    if getmetatable(arr) ~= nil then
+    if getmetatable(arr) ~= getmetatable({}) then
         error("Invalid Argument! Takes a 2D array!")
     end
 
@@ -71,6 +71,7 @@ end
 -- @export
 function fromVector(v, row)
     expect(1, v, "vector")
+    if getmetatable(v) ~= getmetatable(vector.new()) then expect(1, v, "vector") end
     expect(2, row, "boolean", "nil")
 
     row = row or true
@@ -96,7 +97,8 @@ function fromQuaternion(q)
     if not quaternion then
         error("Quaternion API is not loaded!")
     end
-    expect(1, q, "quaternion")
+    expect(1, q, "table")
+    if getmetatable(q).__name ~= "quaternion" then expect(1, v, "quaternion") end
 
     q = q:normalize()
     local w = q.a
@@ -148,8 +150,10 @@ local matrix = {
     -- @usage m1 + m2
     -- @usage m + 5
     add = function(self, other)
-        expect(1, self, "number", "matrix")
-        expect(2, other, "number", "matrix")
+        expect(1, self, "table", "number")
+        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        expect(2, other, "table", "number")
+        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
 
         if type(self) == "number" then
             return other + self
@@ -200,8 +204,10 @@ local matrix = {
     -- @usage m1:mul(m2)
     -- @usage m1 * m2
     mul = function(self, other)
-        expect(1, self, "number", "matrix")
-        expect(2, other, "number", "matrix")
+        expect(1, self, "table", "number")
+        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        expect(2, other, "table", "number")
+        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
 
         if type(self) == "number" then
             return other * self
@@ -237,8 +243,10 @@ local matrix = {
     -- @usage m1:div(m2)
     -- @usage m1 / m2
     div = function(self, other)
-        expect(1, self, "number", "matrix")
-        expect(2, other, "number", "matrix")
+        expect(1, self, "table", "number")
+        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        expect(2, other, "table", "number")
+        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
 
         if type(self) == "number" then
             return self * other:inverse()
@@ -342,8 +350,10 @@ local matrix = {
     -- @usage m1:equals(m2)
     -- @usage m1 == m2
     equals = function(self, other)
-        expect(1, self, "matrix")
-        expect(2, other, "matrix")
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, other, "table")
+        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if type(self) == type(other) and self.rows == other.rows and self.columns == other.columns then
             local identical = true
@@ -595,8 +605,10 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:hadamard_product(m2)
     hadamard_product = function(self, other)
-        expect(1, self, "matrix")
-        expect(2, other, "matrix")
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, other, "table")
+        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise multiplication!")
@@ -618,8 +630,10 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:elementwise_div(m2)
     elementwise_div = function(self, other)
-        expect(1, self, "matrix")
-        expect(2, other, "matrix")
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, other, "table")
+        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise division!")

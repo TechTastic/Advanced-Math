@@ -1,4 +1,3 @@
-/* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #1e1e1e !important;
@@ -19,6 +18,15 @@
     color: #d4d4d4 !important;
   }
   
+  div, section, article {
+    background-color: transparent !important;
+  }
+  
+  .content, .main-content {
+    background-color: #252526 !important;
+    color: #d4d4d4 !important;
+  }
+  
   #navigation {
     background-color: #2d2d30 !important;
     border-right: 1px solid #3e3e42 !important;
@@ -26,6 +34,7 @@
   
   #navigation h1, #navigation h2, #navigation h3 {
     color: #ffffff !important;
+    background-color: transparent !important;
   }
   
   #navigation ul li {
@@ -47,6 +56,11 @@
   h1, h2, h3, h4, h5, h6 {
     color: #ffffff !important;
     border-bottom-color: #3e3e42 !important;
+    background-color: transparent !important;
+  }
+  
+  p, span, li, dd, dt {
+    color: #d4d4d4 !important;
   }
   
   code {
@@ -101,6 +115,7 @@
   
   .function_list, .table_list {
     border: 1px solid #3e3e42 !important;
+    background-color: #2d2d30 !important;
   }
   
   .param, .field {
@@ -111,10 +126,13 @@
     color: #4ec9b0 !important;
   }
   
-  /* Footer */
   #footer {
     background-color: #2d2d30 !important;
     color: #9d9d9d !important;
     border-top: 1px solid #3e3e42 !important;
+  }
+  
+  * {
+    scrollbar-color: #3e3e42 #1e1e1e;
   }
 }

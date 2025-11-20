@@ -1,2 +1,2 @@
-# Changelog - 0.1.0
-- Fixed path for datapack
+# Changelog - 0.1.1
+- Fixed path for datapack AGAIN

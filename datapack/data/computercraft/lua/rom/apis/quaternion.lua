@@ -10,6 +10,8 @@
 --
 -- @module quaternion
 
+local expect = dofile("rom/modules/main/cc/expect.lua").expect
+
 --- Constructors
 --
 -- @section Constructors
@@ -169,10 +171,6 @@ end
 -- This is suitable for representing rotation.
 --
 -- @type Quaternion
-
-local expect = require "cc.expect"
-local expect = expect.expect
-
 local quaternion = {
     --- The imaginary component of the quaternion, stored in a [Vector](https://tweaked.cc/module/vector.html).
     -- @field v

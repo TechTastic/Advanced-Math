@@ -7,6 +7,8 @@
 --
 -- @module matrix
 
+local expect = dofile("rom/modules/main/cc/expect.lua").expect
+
 --- Constructors
 --
 -- @section Constructors
@@ -127,10 +129,6 @@ end
 -- and general numerical computations.
 --
 -- @type Matrix
-
-local expect = require "cc.expect"
-local expect = expect.expect
-
 local matrix = {
     --- The number of rows in the matrix.
     -- @field rows

@@ -1,2 +1,2 @@
-# Changelog - 0.1.1
-- Fixed path for datapack AGAIN
+# Changelog - 0.1.2
+- Swapped `require` for `dofile` in the APIs

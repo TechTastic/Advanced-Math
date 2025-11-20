@@ -144,19 +144,19 @@ end
 -- @type PID
 local pid = {
     --- The setpoint to reach
-    -- @field number|vector|quaternion sp
+    -- @field sp
     -- @tparam number|vector|quaternion sp
 
     --- The proportional gain - how aggressively to respond to the current error
-    -- @field number kp
+    -- @field kp
     -- @tparam number kp
 
     --- The integral gain - how aggressively to eliminate accumulated error
-    -- @field number ki
+    -- @field ki
     -- @tparam number ki
 
     --- The derivative gain - how aggressively to dampen the rate of change
-    -- @field number kd
+    -- @field kd
     -- @tparam number kd
 
     --- Performs a PID control step

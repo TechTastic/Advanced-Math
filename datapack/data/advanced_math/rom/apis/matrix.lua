@@ -18,6 +18,14 @@ local expect = require "cc.expect"
 local expect = expect.expect
 
 local matrix = {
+    --- The number of rows in the matrix.
+    -- @field rows
+    -- @tparam number rows
+
+    --- The number of columns in the matrix.
+    -- @field columns
+    -- @tparam number columns
+
     --- Adds two matrices together, or adds a scalar to all elements.
     -- Supports broadcasting with row vectors and column vectors.
     --
@@ -28,8 +36,8 @@ local matrix = {
     -- @usage m1 + m2
     -- @usage m + 5
     add = function(self, other)
-        expect(1, self, "number", "table")
-        expect(2, other, "number", "table")
+        expect(1, self, "number", "Matrix")
+        expect(2, other, "number", "Matrix")
 
         if type(self) == "number" then
             return other + self
@@ -40,7 +48,7 @@ local matrix = {
             for c = 1, self.columns do
                 if type(other) == "number" then
                     m[r][c] = self[r][c] + other
-                elseif type(other) == "table" and getmetatable(other).__index == getmetatable(self).__index then
+                elseif type(other) == "table" then
                     if other.rows == self.rows and other.columns == 1 then -- rows vector
                         m[r][c] = self[r][c] + other[r][1]
                     elseif other.columns == self.columns and other.rows == 1 then -- columns vector
@@ -80,8 +88,8 @@ local matrix = {
     -- @usage m1:mul(m2)
     -- @usage m1 * m2
     mul = function(self, other)
-        expect(1, self, "number", "table")
-        expect(2, other, "number", "table")
+        expect(1, self, "number", "Matrix")
+        expect(2, other, "number", "Matrix")
 
         if type(self) == "number" then
             return other * self
@@ -93,7 +101,7 @@ local matrix = {
                 for c = 1, self.columns do
                     m[r][c] = self[r][c] * other
                 end
-            elseif type(other) == "table" and getmetatable(other).__index == getmetatable(self).__index and self.rows == other.columns then
+            elseif type(other) == "table" and self.rows == other.columns then
                 for c = 1, other.columns do
                     for k = 1, self.columns do
                         m[r][c] = (m[r][c] or 0) + self[r][k] * other[k][c]
@@ -117,14 +125,14 @@ local matrix = {
     -- @usage m1:div(m2)
     -- @usage m1 / m2
     div = function(self, other)
-        expect(1, self, "number", "table")
-        expect(2, other, "number", "table")
+        expect(1, self, "number", "Matrix")
+        expect(2, other, "number", "Matrix")
 
         if type(self) == "number" then
             return self * other:inverse()
         elseif type(other) == "number" then
             return self * (1 / other)
-        elseif type(other) == "table" and getmetatable(other).__index == getmetatable(self).__index then
+        elseif type(other) == "table" then
             return self * other:inverse()
         else
             error("Invalid Argument! Takes a scalar value or another square matrix!")
@@ -157,7 +165,7 @@ local matrix = {
     -- @usage m:pow(3)
     -- @usage m ^ 3
     pow = function(self, n)
-        expect(2, n, "number")
+        expect(1, n, "number")
         if self.rows ~= self.columns then
             error("Must be a square matrix to raise to a power!")
         end
@@ -222,10 +230,10 @@ local matrix = {
     -- @usage m1:equals(m2)
     -- @usage m1 == m2
     equals = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Matrix")
+        expect(2, other, "Matrix")
 
-        if type(self) == type(other) and type(self) == "table" and getmetatable(other).__index == getmetatable(self).__index and self.rows == other.rows and self.columns == other.columns then
+        if type(self) == type(other) and self.rows == other.rows and self.columns == other.columns then
             local identical = true
             for r = 1, self.rows do
                 for c = 1, self.columns do
@@ -475,8 +483,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:hadamard_product(m2)
     hadamard_product = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Matrix")
+        expect(2, other, "Matrix")
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise multiplication!")
@@ -498,8 +506,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:elementwise_div(m2)
     elementwise_div = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Matrix")
+        expect(2, other, "Matrix")
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise division!")
@@ -582,6 +590,7 @@ local matrix = {
 }
 
 local metatable = {
+    __name = "Matrix",
     __index = matrix,
     __add = matrix.add,
     __sub = matrix.sub,
@@ -594,8 +603,6 @@ local metatable = {
     __eq = matrix.equals
 }
 
--- @section Constructors
-
 --- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
 --
 -- @tparam number rows The number of rows in the matrix
@@ -605,6 +612,8 @@ local metatable = {
 -- @usage m = matrix.new(3, 3, function(r, c) return r + c end)
 -- @usage m = matrix.new(2, 4, 5) -- fills all elements with 5
 -- @usage m = matrix.new(2, 2) -- fills all elements with 1
+-- @section Constructors
+-- @export
 function new(rows, columns, func)
     expect(1, rows, "number", "nil")
     expect(2, columns, "number", "nil")
@@ -633,6 +642,8 @@ end
 -- @tparam table arr A 2D array representing the matrix data
 -- @treturn Matrix A new matrix
 -- @usage m = matrix.from2DArray({{1, 2}, {3, 4}})
+-- @section Constructors
+-- @export
 function from2DArray(arr)
     expect(1, arr, "table")
     if getmetatable(arr) ~= nil then
@@ -649,6 +660,8 @@ end
 -- @treturn Matrix A new matrix representing the vector
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
+-- @section Constructors
+-- @export
 function fromVector(v, row)
     expect(1, v, "table")
     expect(2, row, "boolean", "nil")
@@ -673,6 +686,8 @@ end
 -- @tparam table q The quaternion to convert
 -- @treturn Matrix A new 3x3 rotation matrix
 -- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
+-- @section Constructors
+-- @export
 function fromQuaternion(q)
     if not quaternion then
         error("Quaternion API is not loaded!")
@@ -703,6 +718,8 @@ end
 -- @tparam number columns The number of columns
 -- @treturn Matrix A new identity matrix
 -- @usage m = matrix.identity(3, 3)
+-- @section Constructors
+-- @export
 function identity(rows, columns)
     return new(rows, columns)
 end

@@ -18,6 +18,7 @@ local expect = expect.expect
 -- @treturn the control output
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
+-- @local
 local function scalarStep(self, value, dt)
     expect(1, value, "number")
     expect(2, dt, "number", "nil")
@@ -54,13 +55,11 @@ end
 -- @treturn the control output vector
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
+-- @local
 local function vectorStep(self, value, dt)
-    expect(1, value, "table")
+    expect(1, value, "Vector")
     expect(2, dt, "number", "nil")
     dt = dt or 1
-    if getmetatable(value).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Expected vector!")
-    end
 
     local error = self.sp - value
     local p = error * self.kp
@@ -101,13 +100,11 @@ end
 -- @treturn the angular velocity control output
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
+-- @local
 local function quaternionStep(self, value, dt)
-    expect(1, value, "table")
+    expect(1, value, "Quaternion")
     expect(2, dt, "number", "nil")
     dt = dt or 1
-    if getmetatable(value).__index ~= getmetatable(quaternion.new()).__index then
-        error("Invalid Argument! Expected quaternion!")
-    end
 
     local error_quat = self.sp * value:inverse()
     local error_vec = error_quat:getAxis() * error_quat:getAngle()
@@ -145,6 +142,22 @@ end
 --
 -- @type PID
 local pid = {
+    --- The setpoint to reach
+    -- @field number|vector|quaternion sp
+    -- @tparam number|vector|quaternion sp
+
+    --- The proportional gain - how aggressively to respond to the current error
+    -- @field number kp
+    -- @tparam number kp
+
+    --- The integral gain - how aggressively to eliminate accumulated error
+    -- @field number ki
+    -- @tparam number ki
+
+    --- The derivative gain - how aggressively to dampen the rate of change
+    -- @field number kd
+    -- @tparam number kd
+
     --- Performs a PID control step
     -- @tparam PID self The PID instance
     -- @tparam number|vector|quaternion value The current value being measured
@@ -205,11 +218,10 @@ local pid = {
 }
 
 local metatable = {
+    __name = "PID",
     __index = pid,
     __tostring = pid.tostring
 }
-
--- @section Constructors
 
 --- Constructs a new PID controller for either a scalar, vector, or quaternion target.
 --
@@ -220,8 +232,10 @@ local metatable = {
 -- @tparam boolean discrete Whether to treat the PID as discrete or continuous
 -- @treturn The PID initialized with the given arguments
 -- @usage pid = pid.new(target)
+-- @section Constructors
+-- @export
 function new(target, p, i, d, discrete)
-    expect(1, target, "number", "table")
+    expect(1, target, "number", "Vector", "Quaternion")
     expect(2, p, "number", "nil")
     expect(3, i, "number", "nil")
     expect(4, d, "number", "nil")

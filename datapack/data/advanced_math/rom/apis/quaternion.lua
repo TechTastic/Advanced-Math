@@ -20,6 +20,13 @@ local expect = require "cc.expect"
 local expect = expect.expect
 
 local quaternion = {
+    --- The imaginary component of the quaternion, stored in a vector.
+    -- @field v
+    -- @tparam Vector v
+
+    --- The real component of the quaternion.
+    -- @field a
+    -- @tparam number a
 
     --- Adds two quaternions together. The resulting quaternion will not be normalized. If you want to add rotations together, use the mul function instead.
     --
@@ -29,12 +36,9 @@ local quaternion = {
     -- @usage q1:add(q2)
     -- @usage q1 + q2
     add = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Quaternion")
+        expect(2, other, "Quaternion")
 
-        if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
-            error("Invalid Argument! Takes another quaternion!")
-        end
         return quaternion.new(
             self.v:add(other.v),
             self.a + other.a
@@ -49,12 +53,9 @@ local quaternion = {
     -- @usage q1:sub(q2)
     -- @usage q1 - q2
     sub = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Quaternion")
+        expect(2, other, "Quaternion")
 
-        if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
-            error("Invalid Argument! Takes another quaternion!")
-        end
         return quaternion.new(
             self.v:sub(other.v),
             self.a - other.a
@@ -76,21 +77,21 @@ local quaternion = {
     -- @usage q:mul(v)
     -- @usage q * v
     mul = function(self, other)
-        expect(1, self, "table", "number")
-        expect(2, other, "table", "number")
+        expect(1, self, "Quaternion", "Vector", "number")
+        expect(2, other, "Quaternion", "Vector", "number")
 
-        if type(self) == "number" or (type(self) == "table" and getmetatable(self).__index == getmetatable(vector.new()).__index) then
+        if type(self) == "number" or getmetatable(self).__name == "Vector" then
             return other * self
         end
 
         if type(other) == "table" then
-            if getmetatable(other).__index == getmetatable(self).__index then
+            if getmetatable(other).__name == "Quaternion" then
                 -- Quaternion * Quaternion
                 return quaternion.new(
                     other.v * self.a + self.v * other.a + self.v:cross(other.v),
                     self.a * other.a + -(self.v:dot(other.v))
                 ):normalize()
-            elseif getmetatable(other).__index == getmetatable(vector.new()).__index then
+            elseif getmetatable(other).__name == "Vector" then
                 -- Quaternion * Vector
                 m_q = quaternion.new(other, 0)
                 return (self * m_q * self:conjugate()).v
@@ -117,14 +118,14 @@ local quaternion = {
     -- @usage q:div(2)
     -- @usage q / 2
     div = function(self, other)
-        expect(1, self, "table", "number")
-        expect(2, other, "table", "number")
+        expect(1, self, "Quaternion", "number")
+        expect(2, other, "Quaternion", "number")
 
         if type(self) == "number" then
             return other * (1 / self)
         end
 
-        if type(other) == "table" and getmetatable(other).__index == getmetatable(self).__index then
+        if type(other) == "table" then
             return self * other:inverse()
         end
         if type(other) == "number" then
@@ -179,12 +180,9 @@ local quaternion = {
     -- @usage q1:equals(q2)
     -- @usage q1 == q2
     equals = function(self, other)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Quaternion")
+        expect(2, other, "Quaternion")
 
-        if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index then
-            error("Invalid Argument! Takes another quaternion!")
-        end
         return self.v == other.v and self.a == other.a
     end,
 
@@ -227,13 +225,9 @@ local quaternion = {
     -- @treturn Quaternion The resulting quaternion
     -- @usage q1:slerp(q2, alpha)
 	slerp = function(self, other, alpha)
-        expect(1, self, "table")
-        expect(2, other, "table")
+        expect(1, self, "Quaternion")
+        expect(2, other, "Quaternion")
         expect(3, alpha, "number")
-
-        if type(other) ~= "table" or getmetatable(other).__index ~= getmetatable(self).__index or type(alpha) ~= "number" then
-            error("Invalid Arguments! Takes a target quaternion and an alpha number!")
-        end
 
         local a = self:copy()
         local b = other:copy()
@@ -357,6 +351,7 @@ local quaternion = {
 }
 
 local vmetatable = {
+    __name = "Quaternion",
     __index = quaternion,
     __add = quaternion.add,
     __sub = quaternion.sub,
@@ -368,16 +363,16 @@ local vmetatable = {
     __eq = quaternion.equals,
 }
 
--- @section Constructors
-
 --- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
 --
 -- @tparam Vector vec imaginary component of the vector, stored in a vector
 -- @tparam number w Real component of the quaternion
 -- @treturn The quaternion made from the given arguments
 -- @usage q = quaternion.new(vec, w)
+-- @section Constructors
+-- @export
 function new(vec, w)
-    expect(1, vec, "table", "nil")
+    expect(1, vec, "Vector", "nil")
     expect(2, w, "number", "nil")
     if vec and getmetatable(vec).__index ~= getmetatable(vector.new()).__index then
         error("Invalid Argument! Takes a vector or nil!")
@@ -395,15 +390,11 @@ end
 -- @tparam number angle Angle in radians of the rotation
 -- @treturn The quaternion representing the rotation described by the axis angle parameters
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
+-- @section Constructors
+-- @export
 function fromAxisAngle(axis, angle)
-    expect(1, axis, "table", "nil")
+    expect(1, axis, "Vector", "nil")
     expect(2, angle, "number", "nil")
-    if axis and getmetatable(axis).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Takes a vector or nil!")
-    end
-    if angle and type(angle) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
 
     if not axis then
         axis = vector.new()
@@ -422,19 +413,12 @@ end
 -- @tparam number roll Roll in radians
 -- @treturn the quaternion made from the provided euler angles
 -- @usage q = quaternion.fromEuler(pitch, yaw, roll)
+-- @section Constructors
+-- @export
 function fromEuler(pitch, yaw, roll)
     expect(1, pitch, "number", "nil")
     expect(2, yaw, "number", "nil")
     expect(3, roll, "number", "nil")
-    if pitch and type(pitch) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
-    if yaw and type(yaw) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
-    if roll and type(roll) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
 
     pitch = pitch or 0
     yaw = yaw or 0
@@ -450,20 +434,13 @@ end
 -- @tparam number w
 -- @treturn the quaternion made from the provided components
 -- @usage q = quaternion.fromComponents(x, y, z, w)
+-- @section Constructors
+-- @export
 function fromComponents(x, y, z, w)
     expect(1, x, "number", "nil")
     expect(2, y, "number", "nil")
     expect(3, z, "number", "nil")
     expect(4, w, "number", "nil")
-    if x and type(x) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
-    if y and type(y) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
-    if z and type(z) ~= "number" then
-        error("Invalid Argument! Takes a number or nil!")
-    end
 
     x = x or 0
     y = y or 0
@@ -477,15 +454,13 @@ end
 -- @treturn Quaternion The quaternion representing the same rotation
 --      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
 -- @usage q = quaternion.fromMatrix(m)
+-- @section Constructors
+-- @export
 function fromMatrix(m)
     if not matrix then
         error("Matrix API is not loaded!")
     end
-    expect(1, m, "table")
-
-    if getmetatable(m).__index ~= getmetatable(matrix.new()).__index then
-        error("Invalid Argument! Takes a matrix!")
-    end
+    expect(1, m, "Matrix")
     
     if (m.rows ~= 3 or m.columns ~= 3) and (m.rows ~= 4 or m.columns ~= 4) then
         error("Matrix must be 3x3 or 4x4!")
@@ -536,6 +511,8 @@ end
 --
 -- @treturn an empty identity quaternion
 -- @usage q = quaternion.identity()
+-- @section Constructors
+-- @export
 function identity()
     return new()
 end

@@ -101,6 +101,7 @@ end
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
 -- @local
+-- @see quaternion
 local function quaternionStep(self, value, dt)
     expect(1, value, "Quaternion")
     expect(2, dt, "number", "nil")
@@ -165,6 +166,9 @@ local pid = {
     -- @treturn number|vector|quaternion The control output
     -- @usage output = pid:step(value)
     -- @usage output = pid:step(value, 0.5)
+    -- @see scalarStep
+    -- @see vectorStep
+    -- @see quaternionStep
     step = function() end,  -- to be replaced in constructor
 
     --- Enables/disables the clamping of the output value
@@ -234,6 +238,7 @@ local metatable = {
 -- @usage pid = pid.new(target)
 -- @section Constructors
 -- @export
+-- @see quaternion
 function new(target, p, i, d, discrete)
     expect(1, target, "number", "Vector", "Quaternion")
     expect(2, p, "number", "nil")

@@ -663,13 +663,10 @@ end
 -- @section Constructors
 -- @export
 function fromVector(v, row)
-    expect(1, v, "table")
+    expect(1, v, "Vector")
     expect(2, row, "boolean", "nil")
 
     row = row or true
-    if getmetatable(v).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Takes a vector!")
-    end
     local m = {}
     if row then
         m[1] = {v.x, v.y, v.z}
@@ -688,15 +685,12 @@ end
 -- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
 -- @section Constructors
 -- @export
+-- @see quaternion
 function fromQuaternion(q)
     if not quaternion then
         error("Quaternion API is not loaded!")
     end
-
-    expect(1, q, "table")
-    if getmetatable(q).__index ~= getmetatable(quaternion.new()).__index then
-        error("Invalid Argument! Takes a quaternion!")
-    end
+    expect(1, q, "Quaternion")
 
     q = q:normalize()
     local w = q.a

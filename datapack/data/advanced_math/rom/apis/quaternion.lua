@@ -450,12 +450,14 @@ end
 
 --- Constructs a new quaternion from a 3x3 rotation matrix or 4x4 transformation matrix.
 --
+--
 -- @tparam Matrix m The rotation matrix to convert (3x3 or 4x4)
 -- @treturn Quaternion The quaternion representing the same rotation
 --      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
 -- @usage q = quaternion.fromMatrix(m)
 -- @section Constructors
 -- @export
+-- @see matrix
 function fromMatrix(m)
     if not matrix then
         error("Matrix API is not loaded!")

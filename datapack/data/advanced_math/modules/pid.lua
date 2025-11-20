@@ -209,6 +209,10 @@ local pid = {
     -- @field kd
     -- @tparam number kd
 
+    --- Whether to treat the PID as discrete or continuous
+    -- @field discrete
+    -- @tparam boolean discrete
+
     --- Performs a PID control step
     -- Uses [Vector](https://tweaked.cc/module/vector.html) or Quaternion types when applicable.
     -- @tparam PID self The PID instance

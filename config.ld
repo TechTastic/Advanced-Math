@@ -3,7 +3,7 @@ title = 'Advanced Math Documentation'
 description = 'Mathematical APIs for ComputerCraft'
 file = {
     'datapack/data/computercraft/lua/rom/apis/',
-    'datapack/data/computercraft/lua/modules/'
+    'datapack/data/computercraft/lua/modules/main/'
 }
 format = 'markdown'
 dir = 'docs'

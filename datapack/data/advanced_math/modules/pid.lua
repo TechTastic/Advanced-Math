@@ -261,16 +261,14 @@ function new(target, p, i, d, discrete)
         controller.integral = 0
         controller.prev_error = 0
     elseif type(target) == "table" then
-        if vector and getmetatable(target).__index == getmetatable(vector.new()).__index then
+        if vector and getmetatable(target).__name == "Vector" then
             controller.step = vectorStep
             controller.integral = vector.new()
             controller.prev_error = vector.new()
-        elseif quaternion and getmetatable(target).__index == getmetatable(quaternion.new()).__index then
+        elseif quaternion then
             controller.step = quaternionStep
             controller.integral = vector.new()
             controller.prev_error = vector.new()
-        else
-            error("Invalid Target! This PID library only accepts scalar, vector, or quaternion targets!")
         end
     end
     return setmetatable(controller, metatable)

@@ -363,13 +363,16 @@ local vmetatable = {
     __eq = quaternion.equals,
 }
 
+--- Constructors
+--
+-- @section Constructors
+
 --- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
 --
 -- @tparam Vector vec imaginary component of the vector, stored in a vector
 -- @tparam number w Real component of the quaternion
 -- @treturn The quaternion made from the given arguments
 -- @usage q = quaternion.new(vec, w)
--- @section Constructors
 -- @export
 function new(vec, w)
     expect(1, vec, "Vector", "nil")
@@ -390,7 +393,6 @@ end
 -- @tparam number angle Angle in radians of the rotation
 -- @treturn The quaternion representing the rotation described by the axis angle parameters
 -- @usage q = quaternion.fromAxisAngle(axis, angle)
--- @section Constructors
 -- @export
 function fromAxisAngle(axis, angle)
     expect(1, axis, "Vector", "nil")
@@ -413,7 +415,6 @@ end
 -- @tparam number roll Roll in radians
 -- @treturn the quaternion made from the provided euler angles
 -- @usage q = quaternion.fromEuler(pitch, yaw, roll)
--- @section Constructors
 -- @export
 function fromEuler(pitch, yaw, roll)
     expect(1, pitch, "number", "nil")
@@ -434,7 +435,6 @@ end
 -- @tparam number w
 -- @treturn the quaternion made from the provided components
 -- @usage q = quaternion.fromComponents(x, y, z, w)
--- @section Constructors
 -- @export
 function fromComponents(x, y, z, w)
     expect(1, x, "number", "nil")
@@ -455,7 +455,6 @@ end
 -- @treturn Quaternion The quaternion representing the same rotation
 --      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
 -- @usage q = quaternion.fromMatrix(m)
--- @section Constructors
 -- @export
 -- @see matrix
 function fromMatrix(m)
@@ -513,7 +512,6 @@ end
 --
 -- @treturn an empty identity quaternion
 -- @usage q = quaternion.identity()
--- @section Constructors
 -- @export
 function identity()
     return new()

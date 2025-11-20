@@ -227,6 +227,10 @@ local metatable = {
     __tostring = pid.tostring
 }
 
+--- Constructors
+--
+-- @section Constructors
+
 --- Constructs a new PID controller for either a scalar, vector, or quaternion target.
 --
 -- @tparam number|vector|quaternion target The setpoint to reach
@@ -236,7 +240,6 @@ local metatable = {
 -- @tparam boolean discrete Whether to treat the PID as discrete or continuous
 -- @treturn The PID initialized with the given arguments
 -- @usage pid = pid.new(target)
--- @section Constructors
 -- @export
 -- @see quaternion
 function new(target, p, i, d, discrete)

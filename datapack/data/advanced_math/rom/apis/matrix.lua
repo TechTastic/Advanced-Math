@@ -603,6 +603,10 @@ local metatable = {
     __eq = matrix.equals
 }
 
+--- Constructors
+--
+-- @section Constructors
+
 --- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
 --
 -- @tparam number rows The number of rows in the matrix
@@ -612,7 +616,6 @@ local metatable = {
 -- @usage m = matrix.new(3, 3, function(r, c) return r + c end)
 -- @usage m = matrix.new(2, 4, 5) -- fills all elements with 5
 -- @usage m = matrix.new(2, 2) -- fills all elements with 1
--- @section Constructors
 -- @export
 function new(rows, columns, func)
     expect(1, rows, "number", "nil")
@@ -642,7 +645,6 @@ end
 -- @tparam table arr A 2D array representing the matrix data
 -- @treturn Matrix A new matrix
 -- @usage m = matrix.from2DArray({{1, 2}, {3, 4}})
--- @section Constructors
 -- @export
 function from2DArray(arr)
     expect(1, arr, "table")
@@ -660,7 +662,6 @@ end
 -- @treturn Matrix A new matrix representing the vector
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
--- @section Constructors
 -- @export
 function fromVector(v, row)
     expect(1, v, "Vector")
@@ -683,7 +684,6 @@ end
 -- @tparam table q The quaternion to convert
 -- @treturn Matrix A new 3x3 rotation matrix
 -- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
--- @section Constructors
 -- @export
 -- @see quaternion
 function fromQuaternion(q)
@@ -712,7 +712,6 @@ end
 -- @tparam number columns The number of columns
 -- @treturn Matrix A new identity matrix
 -- @usage m = matrix.identity(3, 3)
--- @section Constructors
 -- @export
 function identity(rows, columns)
     return new(rows, columns)

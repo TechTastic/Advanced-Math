@@ -8,6 +8,7 @@
 -- @module matrix
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect
+local metatable
 
 --- Constructors
 --
@@ -715,7 +716,7 @@ local matrix = {
     end
 }
 
-local metatable = {
+metatable = {
     __name = "matrix",
     __index = matrix,
     __add = matrix.add,

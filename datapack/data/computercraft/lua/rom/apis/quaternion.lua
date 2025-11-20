@@ -11,6 +11,7 @@
 -- @module quaternion
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect
+local metatable
 
 --- Constructors
 --
@@ -31,7 +32,7 @@ function new(vec, w)
 	return setmetatable({
         v = vec or vector.new(),
         a = tonumber(w) or 1,
-    }, vmetatable)
+    }, metatable)
 end
 
 --- Constructs a new quaternion from the provided axis - angle parameters. The resulting quaternion is already normalized.
@@ -513,7 +514,7 @@ local quaternion = {
     end
 }
 
-local vmetatable = {
+metatable = {
     __name = "quaternion",
     __index = quaternion,
     __add = quaternion.add,

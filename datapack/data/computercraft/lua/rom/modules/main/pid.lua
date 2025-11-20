@@ -9,6 +9,7 @@
 
 local expect = require "cc.expect"
 local expect = expect.expect
+local metatable
 
 --- Constructors
 --
@@ -280,7 +281,7 @@ local pid = {
     end
 }
 
-local metatable = {
+metatable = {
     __name = "PID",
     __index = pid,
     __tostring = pid.tostring

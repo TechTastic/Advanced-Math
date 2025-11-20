@@ -7,6 +7,120 @@
 --
 -- @module matrix
 
+--- Constructors
+--
+-- @section Constructors
+
+--- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
+--
+-- @tparam number rows The number of rows in the matrix
+-- @tparam number columns The number of columns in the matrix
+-- @tparam function|number|nil func A function taking (row, column) to generate values, or a scalar to fill all elements
+-- @treturn Matrix A new matrix
+-- @usage m = matrix.new(3, 3, function(r, c) return r + c end)
+-- @usage m = matrix.new(2, 4, 5) -- fills all elements with 5
+-- @usage m = matrix.new(2, 2) -- fills all elements with 1
+-- @export
+function new(rows, columns, func)
+    expect(1, rows, "number", "nil")
+    expect(2, columns, "number", "nil")
+    expect(3, func, "function", "number", "nil")
+
+    local m = {}
+    m.rows = rows or 1
+    m.columns = columns or 1
+    for r = 1, rows do
+        m[r] = {}
+        for c = 1, columns do
+            if type(func) == "function" then
+                m[r][c] = func(r, c)
+            elseif type(func) == "number" then
+                m[r][c] = func
+            else
+                m[r][c] = 1
+            end
+        end
+    end
+    return setmetatable(m, metatable)
+end
+
+--- Constructs a matrix from a 2D array (table of tables).
+--
+-- @tparam table arr A 2D array representing the matrix data
+-- @treturn Matrix A new matrix
+-- @usage m = matrix.from2DArray({{1, 2}, {3, 4}})
+-- @export
+function from2DArray(arr)
+    expect(1, arr, "table")
+    if getmetatable(arr) ~= nil then
+        error("Invalid Argument! Takes a 2D array!")
+    end
+
+    return new(#arr, #arr[1], function(r, c) return arr[r][c] or 0 end)
+end
+
+--- Constructs a matrix from a vector, as either a row or column matrix.
+--
+-- @tparam table v The vector to convert
+-- @tparam boolean row Whether to create a row matrix (true) or column matrix (false). Defaults to true.
+-- @treturn Matrix A new matrix representing the vector
+-- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
+-- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
+-- @export
+function fromVector(v, row)
+    expect(1, v, "Vector")
+    expect(2, row, "boolean", "nil")
+
+    row = row or true
+    local m = {}
+    if row then
+        m[1] = {v.x, v.y, v.z}
+    else
+        m[1] = {v.x}
+        m[2] = {v.y}
+        m[3] = {v.z}
+    end
+    return from2DArray(m)
+end
+
+--- Constructs a rotation matrix from a quaternion.
+--
+-- @tparam table q The quaternion to convert
+-- @treturn Matrix A new 3x3 rotation matrix
+-- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
+-- @export
+-- @see quaternion
+function fromQuaternion(q)
+    if not quaternion then
+        error("Quaternion API is not loaded!")
+    end
+    expect(1, q, "Quaternion")
+
+    q = q:normalize()
+    local w = q.a
+    local x = q.v.x
+    local y = q.v.y
+    local z = q.v.z
+
+    local m = {
+        {1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)},
+        {2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)},
+        {2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)}
+    }
+    return from2DArray(m)
+end
+
+--- Constructs an identity matrix of given dimensions.
+--
+-- @tparam number rows The number of rows
+-- @tparam number columns The number of columns
+-- @treturn Matrix A new identity matrix
+-- @usage m = matrix.identity(3, 3)
+-- @export
+function identity(rows, columns)
+    return new(rows, columns)
+end
+
 --- A matrix, with dimensions `rows` x `columns`.
 --
 -- This is suitable for representing linear transformations, systems of equations,
@@ -602,117 +716,3 @@ local metatable = {
     __tostring = matrix.tostring,
     __eq = matrix.equals
 }
-
---- Constructors
---
--- @section Constructors
-
---- Constructs a new matrix of rows by columns, filling it using the provided function or scalar.
---
--- @tparam number rows The number of rows in the matrix
--- @tparam number columns The number of columns in the matrix
--- @tparam function|number|nil func A function taking (row, column) to generate values, or a scalar to fill all elements
--- @treturn Matrix A new matrix
--- @usage m = matrix.new(3, 3, function(r, c) return r + c end)
--- @usage m = matrix.new(2, 4, 5) -- fills all elements with 5
--- @usage m = matrix.new(2, 2) -- fills all elements with 1
--- @export
-function new(rows, columns, func)
-    expect(1, rows, "number", "nil")
-    expect(2, columns, "number", "nil")
-    expect(3, func, "function", "number", "nil")
-
-    local m = {}
-    m.rows = rows or 1
-    m.columns = columns or 1
-    for r = 1, rows do
-        m[r] = {}
-        for c = 1, columns do
-            if type(func) == "function" then
-                m[r][c] = func(r, c)
-            elseif type(func) == "number" then
-                m[r][c] = func
-            else
-                m[r][c] = 1
-            end
-        end
-    end
-    return setmetatable(m, metatable)
-end
-
---- Constructs a matrix from a 2D array (table of tables).
---
--- @tparam table arr A 2D array representing the matrix data
--- @treturn Matrix A new matrix
--- @usage m = matrix.from2DArray({{1, 2}, {3, 4}})
--- @export
-function from2DArray(arr)
-    expect(1, arr, "table")
-    if getmetatable(arr) ~= nil then
-        error("Invalid Argument! Takes a 2D array!")
-    end
-
-    return new(#arr, #arr[1], function(r, c) return arr[r][c] or 0 end)
-end
-
---- Constructs a matrix from a vector, as either a row or column matrix.
---
--- @tparam table v The vector to convert
--- @tparam boolean row Whether to create a row matrix (true) or column matrix (false). Defaults to true.
--- @treturn Matrix A new matrix representing the vector
--- @usage m = matrix.fromVector(vector.new(1, 2, 3), true) -- row matrix
--- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
--- @export
-function fromVector(v, row)
-    expect(1, v, "Vector")
-    expect(2, row, "boolean", "nil")
-
-    row = row or true
-    local m = {}
-    if row then
-        m[1] = {v.x, v.y, v.z}
-    else
-        m[1] = {v.x}
-        m[2] = {v.y}
-        m[3] = {v.z}
-    end
-    return from2DArray(m)
-end
-
---- Constructs a rotation matrix from a quaternion.
---
--- @tparam table q The quaternion to convert
--- @treturn Matrix A new 3x3 rotation matrix
--- @usage m = matrix.fromQuaternion(quaternion.new(1, vector.new(0, 0, 0)))
--- @export
--- @see quaternion
-function fromQuaternion(q)
-    if not quaternion then
-        error("Quaternion API is not loaded!")
-    end
-    expect(1, q, "Quaternion")
-
-    q = q:normalize()
-    local w = q.a
-    local x = q.v.x
-    local y = q.v.y
-    local z = q.v.z
-
-    local m = {
-        {1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)},
-        {2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)},
-        {2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)}
-    }
-    return from2DArray(m)
-end
-
---- Constructs an identity matrix of given dimensions.
---
--- @tparam number rows The number of rows
--- @tparam number columns The number of columns
--- @treturn Matrix A new identity matrix
--- @usage m = matrix.identity(3, 3)
--- @export
-function identity(rows, columns)
-    return new(rows, columns)
-end

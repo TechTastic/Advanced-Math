@@ -10,6 +10,160 @@
 --
 -- @module quaternion
 
+--- Constructors
+--
+-- @section Constructors
+
+--- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
+--
+-- @tparam Vector vec imaginary component of the vector, stored in a vector
+-- @tparam number w Real component of the quaternion
+-- @treturn The quaternion made from the given arguments
+-- @usage q = quaternion.new(vec, w)
+-- @export
+function new(vec, w)
+    expect(1, vec, "Vector", "nil")
+    expect(2, w, "number", "nil")
+    if vec and getmetatable(vec).__index ~= getmetatable(vector.new()).__index then
+        error("Invalid Argument! Takes a vector or nil!")
+    end
+
+	return setmetatable({
+        v = vec or vector.new(),
+        a = tonumber(w) or 1,
+    }, vmetatable)
+end
+
+--- Constructs a new quaternion from the provided axis - angle parameters. The resulting quaternion is already normalized.
+--
+-- @tparam Vector axis Rotation axis that will be used for the quaternion. The axis does not need to be normalized
+-- @tparam number angle Angle in radians of the rotation
+-- @treturn The quaternion representing the rotation described by the axis angle parameters
+-- @usage q = quaternion.fromAxisAngle(axis, angle)
+-- @export
+function fromAxisAngle(axis, angle)
+    expect(1, axis, "Vector", "nil")
+    expect(2, angle, "number", "nil")
+
+    if not axis then
+        axis = vector.new()
+    else
+        axis = axis:normalize()
+    end
+    angle = angle or 0
+    local h_angle = angle / 2
+    return new(axis * math.sin(h_angle), math.cos(h_angle))
+end
+
+--- Constructs a new quaternion using the provided pitch, yaw and roll. Uses the YXZ reference frame
+--
+-- @tparam number pitch Pitch in radians
+-- @tparam number yaw Yaw in radians
+-- @tparam number roll Roll in radians
+-- @treturn the quaternion made from the provided euler angles
+-- @usage q = quaternion.fromEuler(pitch, yaw, roll)
+-- @export
+function fromEuler(pitch, yaw, roll)
+    expect(1, pitch, "number", "nil")
+    expect(2, yaw, "number", "nil")
+    expect(3, roll, "number", "nil")
+
+    pitch = pitch or 0
+    yaw = yaw or 0
+    roll = roll or 0
+    return fromAxisAngle(vector.new(0, 1, 0), yaw) * fromAxisAngle(vector.new(1, 0, 0), pitch) * fromAxisAngle(vector.new(0, 0, 1), roll)
+end
+
+--- Constructs a new quaternion using the four provided components. This will not normalize the quaternion unlike other functions, so use at your own risks.
+--
+-- @tparam number x
+-- @tparam number y
+-- @tparam number z
+-- @tparam number w
+-- @treturn the quaternion made from the provided components
+-- @usage q = quaternion.fromComponents(x, y, z, w)
+-- @export
+function fromComponents(x, y, z, w)
+    expect(1, x, "number", "nil")
+    expect(2, y, "number", "nil")
+    expect(3, z, "number", "nil")
+    expect(4, w, "number", "nil")
+
+    x = x or 0
+    y = y or 0
+    z = z or 0
+    return new(vector.new(x, y, z), w)
+end
+
+--- Constructs a new quaternion from a 3x3 rotation matrix or 4x4 transformation matrix.
+--
+--
+-- @tparam Matrix m The rotation matrix to convert (3x3 or 4x4)
+-- @treturn Quaternion The quaternion representing the same rotation
+--      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
+-- @usage q = quaternion.fromMatrix(m)
+-- @export
+-- @see matrix
+function fromMatrix(m)
+    if not matrix then
+        error("Matrix API is not loaded!")
+    end
+    expect(1, m, "Matrix")
+    
+    if (m.rows ~= 3 or m.columns ~= 3) and (m.rows ~= 4 or m.columns ~= 4) then
+        error("Matrix must be 3x3 or 4x4!")
+    end
+    
+    if m.rows == 4 then
+        m = m:minor(4, 4)
+    end
+    
+    local trace = m:trace()
+    
+    local w, x, y, z
+    
+    if trace > 0 then
+        local s = math.sqrt(trace + 1.0) * 2
+        w = 0.25 * s
+        x = (m[3][2] - m[2][3]) / s
+        y = (m[1][3] - m[3][1]) / s
+        z = (m[2][1] - m[1][2]) / s
+    elseif m[1][1] > m[2][2] and m[1][1] > m[3][3] then
+        local s = math.sqrt(1.0 + m[1][1] - m[2][2] - m[3][3]) * 2
+        w = (m[3][2] - m[2][3]) / s
+        x = 0.25 * s
+        y = (m[1][2] + m[2][1]) / s
+        z = (m[1][3] + m[3][1]) / s
+    elseif m[2][2] > m[3][3] then
+        local s = math.sqrt(1.0 + m[2][2] - m[1][1] - m[3][3]) * 2
+        w = (m[1][3] - m[3][1]) / s
+        x = (m[1][2] + m[2][1]) / s
+        y = 0.25 * s
+        z = (m[2][3] + m[3][2]) / s
+    else
+        local s = math.sqrt(1.0 + m[3][3] - m[1][1] - m[2][2]) * 2
+        w = (m[2][1] - m[1][2]) / s
+        x = (m[1][3] + m[3][1]) / s
+        y = (m[2][3] + m[3][2]) / s
+        z = 0.25 * s
+    end
+    
+    return fromComponents(x, y, z, w)
+end
+
+function fromShip()
+    error("This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.")
+end
+
+--- Constructs a new identity quaternion, representing an empty rotation.
+--
+-- @treturn an empty identity quaternion
+-- @usage q = quaternion.identity()
+-- @export
+function identity()
+    return new()
+end
+
 --- A quaternion, with imaginary component `v` and real component `a`.
 --
 -- This is suitable for representing rotation.
@@ -362,157 +516,3 @@ local vmetatable = {
     __tostring = quaternion.tostring,
     __eq = quaternion.equals,
 }
-
---- Constructors
---
--- @section Constructors
-
---- Constructs a new quaternion from a vector and a w parameter. Similarly to fromComponents, this method will not produce a normalized quaternion.
---
--- @tparam Vector vec imaginary component of the vector, stored in a vector
--- @tparam number w Real component of the quaternion
--- @treturn The quaternion made from the given arguments
--- @usage q = quaternion.new(vec, w)
--- @export
-function new(vec, w)
-    expect(1, vec, "Vector", "nil")
-    expect(2, w, "number", "nil")
-    if vec and getmetatable(vec).__index ~= getmetatable(vector.new()).__index then
-        error("Invalid Argument! Takes a vector or nil!")
-    end
-
-	return setmetatable({
-        v = vec or vector.new(),
-        a = tonumber(w) or 1,
-    }, vmetatable)
-end
-
---- Constructs a new quaternion from the provided axis - angle parameters. The resulting quaternion is already normalized.
---
--- @tparam Vector axis Rotation axis that will be used for the quaternion. The axis does not need to be normalized
--- @tparam number angle Angle in radians of the rotation
--- @treturn The quaternion representing the rotation described by the axis angle parameters
--- @usage q = quaternion.fromAxisAngle(axis, angle)
--- @export
-function fromAxisAngle(axis, angle)
-    expect(1, axis, "Vector", "nil")
-    expect(2, angle, "number", "nil")
-
-    if not axis then
-        axis = vector.new()
-    else
-        axis = axis:normalize()
-    end
-    angle = angle or 0
-    local h_angle = angle / 2
-    return new(axis * math.sin(h_angle), math.cos(h_angle))
-end
-
---- Constructs a new quaternion using the provided pitch, yaw and roll. Uses the YXZ reference frame
---
--- @tparam number pitch Pitch in radians
--- @tparam number yaw Yaw in radians
--- @tparam number roll Roll in radians
--- @treturn the quaternion made from the provided euler angles
--- @usage q = quaternion.fromEuler(pitch, yaw, roll)
--- @export
-function fromEuler(pitch, yaw, roll)
-    expect(1, pitch, "number", "nil")
-    expect(2, yaw, "number", "nil")
-    expect(3, roll, "number", "nil")
-
-    pitch = pitch or 0
-    yaw = yaw or 0
-    roll = roll or 0
-    return fromAxisAngle(vector.new(0, 1, 0), yaw) * fromAxisAngle(vector.new(1, 0, 0), pitch) * fromAxisAngle(vector.new(0, 0, 1), roll)
-end
-
---- Constructs a new quaternion using the four provided components. This will not normalize the quaternion unlike other functions, so use at your own risks.
---
--- @tparam number x
--- @tparam number y
--- @tparam number z
--- @tparam number w
--- @treturn the quaternion made from the provided components
--- @usage q = quaternion.fromComponents(x, y, z, w)
--- @export
-function fromComponents(x, y, z, w)
-    expect(1, x, "number", "nil")
-    expect(2, y, "number", "nil")
-    expect(3, z, "number", "nil")
-    expect(4, w, "number", "nil")
-
-    x = x or 0
-    y = y or 0
-    z = z or 0
-    return new(vector.new(x, y, z), w)
-end
-
---- Constructs a new quaternion from a 3x3 rotation matrix or 4x4 transformation matrix.
---
---
--- @tparam Matrix m The rotation matrix to convert (3x3 or 4x4)
--- @treturn Quaternion The quaternion representing the same rotation
---      Note: For 4x4 matrices, only the upper-left 3x3 rotation portion is used
--- @usage q = quaternion.fromMatrix(m)
--- @export
--- @see matrix
-function fromMatrix(m)
-    if not matrix then
-        error("Matrix API is not loaded!")
-    end
-    expect(1, m, "Matrix")
-    
-    if (m.rows ~= 3 or m.columns ~= 3) and (m.rows ~= 4 or m.columns ~= 4) then
-        error("Matrix must be 3x3 or 4x4!")
-    end
-    
-    if m.rows == 4 then
-        m = m:minor(4, 4)
-    end
-    
-    local trace = m:trace()
-    
-    local w, x, y, z
-    
-    if trace > 0 then
-        local s = math.sqrt(trace + 1.0) * 2
-        w = 0.25 * s
-        x = (m[3][2] - m[2][3]) / s
-        y = (m[1][3] - m[3][1]) / s
-        z = (m[2][1] - m[1][2]) / s
-    elseif m[1][1] > m[2][2] and m[1][1] > m[3][3] then
-        local s = math.sqrt(1.0 + m[1][1] - m[2][2] - m[3][3]) * 2
-        w = (m[3][2] - m[2][3]) / s
-        x = 0.25 * s
-        y = (m[1][2] + m[2][1]) / s
-        z = (m[1][3] + m[3][1]) / s
-    elseif m[2][2] > m[3][3] then
-        local s = math.sqrt(1.0 + m[2][2] - m[1][1] - m[3][3]) * 2
-        w = (m[1][3] - m[3][1]) / s
-        x = (m[1][2] + m[2][1]) / s
-        y = 0.25 * s
-        z = (m[2][3] + m[3][2]) / s
-    else
-        local s = math.sqrt(1.0 + m[3][3] - m[1][1] - m[2][2]) * 2
-        w = (m[2][1] - m[1][2]) / s
-        x = (m[1][3] + m[3][1]) / s
-        y = (m[2][3] + m[3][2]) / s
-        z = 0.25 * s
-    end
-    
-    return fromComponents(x, y, z, w)
-end
-
-function fromShip()
-    error("This method is no longer required as of CC: VS 0.4.0, as the Ship API now provides quaternions directly.")
-end
-
---- Constructs a new identity quaternion, representing an empty rotation.
---
--- @treturn an empty identity quaternion
--- @usage q = quaternion.identity()
--- @export
-function identity()
-    return new()
-end

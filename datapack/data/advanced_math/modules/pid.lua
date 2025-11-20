@@ -10,6 +10,53 @@
 local expect = require "cc.expect"
 local expect = expect.expect
 
+--- Constructors
+--
+-- @section Constructors
+
+--- Constructs a new PID controller for either a scalar, vector, or quaternion target.
+--
+-- @tparam number|vector|quaternion target The setpoint to reach
+-- @tparam number p Proportional gain - how aggressively to respond to the current error
+-- @tparam number i Integral gain - how aggressively to eliminate accumulated error
+-- @tparam number d Derivative gain - how aggressively to dampen the rate of change
+-- @tparam boolean discrete Whether to treat the PID as discrete or continuous
+-- @treturn The PID initialized with the given arguments
+-- @usage pid = pid.new(target)
+-- @export
+-- @see quaternion
+function new(target, p, i, d, discrete)
+    expect(1, target, "number", "Vector", "Quaternion")
+    expect(2, p, "number", "nil")
+    expect(3, i, "number", "nil")
+    expect(4, d, "number", "nil")
+    expect(5, discrete, "boolean", "nil")
+
+    local controller = {
+        sp = target or 1,
+        kp = p or 1,
+        ki = i or 0,
+        kd = d or 0,
+        discrete = discrete or true
+    }
+    if type(target) == "number" then
+        controller.step = scalarStep
+        controller.integral = 0
+        controller.prev_error = 0
+    elseif type(target) == "table" then
+        if vector and getmetatable(target).__name == "Vector" then
+            controller.step = vectorStep
+            controller.integral = vector.new()
+            controller.prev_error = vector.new()
+        elseif quaternion then
+            controller.step = quaternionStep
+            controller.integral = vector.new()
+            controller.prev_error = vector.new()
+        end
+    end
+    return setmetatable(controller, metatable)
+end
+
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --
 -- @tparam pid self The PID instance
@@ -166,9 +213,7 @@ local pid = {
     -- @treturn number|vector|quaternion The control output
     -- @usage output = pid:step(value)
     -- @usage output = pid:step(value, 0.5)
-    -- @see scalarStep
-    -- @see vectorStep
-    -- @see quaternionStep
+    -- @see quaternion
     step = function() end,  -- to be replaced in constructor
 
     --- Enables/disables the clamping of the output value
@@ -226,52 +271,5 @@ local metatable = {
     __index = pid,
     __tostring = pid.tostring
 }
-
---- Constructors
---
--- @section Constructors
-
---- Constructs a new PID controller for either a scalar, vector, or quaternion target.
---
--- @tparam number|vector|quaternion target The setpoint to reach
--- @tparam number p Proportional gain - how aggressively to respond to the current error
--- @tparam number i Integral gain - how aggressively to eliminate accumulated error
--- @tparam number d Derivative gain - how aggressively to dampen the rate of change
--- @tparam boolean discrete Whether to treat the PID as discrete or continuous
--- @treturn The PID initialized with the given arguments
--- @usage pid = pid.new(target)
--- @export
--- @see quaternion
-function new(target, p, i, d, discrete)
-    expect(1, target, "number", "Vector", "Quaternion")
-    expect(2, p, "number", "nil")
-    expect(3, i, "number", "nil")
-    expect(4, d, "number", "nil")
-    expect(5, discrete, "boolean", "nil")
-
-    local controller = {
-        sp = target or 1,
-        kp = p or 1,
-        ki = i or 0,
-        kd = d or 0,
-        discrete = discrete or true
-    }
-    if type(target) == "number" then
-        controller.step = scalarStep
-        controller.integral = 0
-        controller.prev_error = 0
-    elseif type(target) == "table" then
-        if vector and getmetatable(target).__name == "Vector" then
-            controller.step = vectorStep
-            controller.integral = vector.new()
-            controller.prev_error = vector.new()
-        elseif quaternion then
-            controller.step = quaternionStep
-            controller.integral = vector.new()
-            controller.prev_error = vector.new()
-        end
-    end
-    return setmetatable(controller, metatable)
-end
 
 return {new = new}

@@ -8,6 +8,11 @@
 --
 -- Special thanks to getItemFromBlock and Shlomo for sharing their own quaternion handling code.
 --
+-- If you are interested in using [CCSharp][ccsharp], here is the compatible [Matrix.cs][ccsharp-quaternion] file.
+--
+-- [ccsharp]: https://github.com/monkeymanboy/CCSharp
+-- [ccsharp-quaternion]: https://github.com/TechTastic/Advanced-Math/blob/main/CCSharp/src/CCSharp/AdvancedMath/Quaternion.cs
+--
 -- @module quaternion
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect

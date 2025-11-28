@@ -26,7 +26,6 @@ local metatable
 -- @usage pid = pid.new(target)
 -- @export
 -- @see quaternion
--- @see https://tweaked.cc/module/vector.html vector
 function new(target, p, i, d, discrete)
     expect(1, target, "table", "number")
 
@@ -109,7 +108,6 @@ end
 -- @usage output = pid:step(value)
 -- @usage output = pid:step(value, 0.5)
 -- @local
--- @see https://tweaked.cc/module/vector.html vector
 local function vectorStep(self, value, dt)
     expect(1, value, "table")
     if getmetatable(value) ~= getmetatable(vector.new()) then expect(1, value, "vector") end
@@ -220,7 +218,7 @@ local pid = {
     -- @field discrete
     -- @tparam boolean discrete
 
-    --- Performs a PID control step
+    --- Performs a PID control step.
     -- Uses [Vector](https://tweaked.cc/module/vector.html) or Quaternion types when applicable.
     -- @tparam PID self The PID instance
     -- @tparam number|vector|quaternion value The current value being measured

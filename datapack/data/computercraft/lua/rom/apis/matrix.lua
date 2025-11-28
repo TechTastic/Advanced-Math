@@ -5,6 +5,11 @@
 --
 -- [wiki]: https://en.wikipedia.org/wiki/Matrix_(mathematics)
 --
+-- If you are interested in using [CCSharp][ccsharp], here is the compatible [Matrix.cs][ccsharp-matrix] file.
+--
+-- [ccsharp]: https://github.com/monkeymanboy/CCSharp
+-- [ccsharp-matrix]: https://github.com/TechTastic/Advanced-Math/blob/main/CCSharp/src/CCSharp/AdvancedMath/Matrix.cs
+--
 -- @module matrix
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect
@@ -126,6 +131,84 @@ function identity(rows, columns)
     return new(rows, columns)
 end
 
+--- Utility Functions
+--
+-- @section Utility Functions
+
+--- Solves the system of linear equations Ax = b for x.
+--
+-- @tparam Matrix A The coefficient matrix
+-- @tparam Matrix b The right-hand side matrix (column vector)
+-- @treturn Matrix The solution matrix x
+-- @usage x = matrix.solve(A, b)
+-- @export
+function solve(A, b, tol)
+    expect(1, A, "table")
+    if getmetatable(A).__name ~= "matrix" then expect(1, A, "matrix") end
+    expect(2, b, "table")
+    if getmetatable(b).__name ~= "matrix" then expect(1, b, "matrix") end
+    expect(3, tol, "number", "nil")
+    tol = tol or 1e-10
+
+    if A.rows ~= A.columns then
+        error("Matrix A must be square!")
+    end
+    if b.columns ~= 1 or b.rows ~= A.rows then
+        error("Matrix b must be a column vector with the same number of rows as A!")
+    end
+
+    local n = A.rows
+
+    local aug = matrix.new(n, n + 1, function(r, c)
+        if c <= n then
+            return A[r][c]
+        else
+            return b[r][1]
+        end
+    end)
+
+    local warning = nil
+    for col = 1, n do
+        local maxVal, maxRow = math.abs(aug[col][col]), col
+        for r = col + 1, n do
+            if math.abs(aug[r][col]) > maxVal then
+                maxVal = math.abs(aug[r][col])
+                maxRow = r
+            end
+        end
+
+        if maxVal < tol then
+            error("Matrix is singular or nearly singular! No unique solution exists.")
+        elseif maxVal < 1e-6 then
+            warning = "Warning: Matrix may be ill-conditioned"
+        end
+
+        aug[col], aug[maxRow] = aug[maxRow], aug[col]
+
+        for r = col + 1, n do
+            local factor = aug[r][col] / aug[col][col]
+            for c = col, n + 1 do
+                aug[r][c] = aug[r][c] - factor * aug[col][c]
+            end
+        end
+    end
+
+    local x = {}
+    for i = 1, n do
+        x[i] = {0}
+    end
+
+    for r = n, 1, -1 do
+        local sum = aug[r][n + 1]
+        for c = r + 1, n do
+            sum = sum - aug[r][c] * x[c][1]
+        end
+        x[r][1] = sum / aug[r][r]
+    end
+
+    return from2DArray(x), warning
+end
+
 --- A matrix, with dimensions `rows` x `columns`.
 --
 -- This is suitable for representing linear transformations, systems of equations,
@@ -159,28 +242,21 @@ local matrix = {
         if type(self) == "number" then
             return other + self
         end
-        local m = {}
-        for r = 1, self.rows do
-            m[r] = {}
-            for c = 1, self.columns do
-                if type(other) == "number" then
-                    m[r][c] = self[r][c] + other
-                elseif type(other) == "table" then
-                    if other.rows == self.rows and other.columns == 1 then -- rows vector
-                        m[r][c] = self[r][c] + other[r][1]
-                    elseif other.columns == self.columns and other.rows == 1 then -- columns vector
-                        m[r][c] = self[r][c] + other[1][c]
-                    elseif other.rows == self.rows or other.columns == self.columns then
-                        m[r][c] = self[r][c] + other[r][c]
-                    else
-                        error("Invalid Argument! Takes a scalar value, a vector matrix or another matrix of the same dimensions!")
-                    end
-                else
-                    error("Invalid Argument! Takes a scalar value, a vector matrix or another matrix of the same dimensions!")
-                end
+
+        return new(self.rows, self.columns, function(r, c)
+            local val = self[r][c]
+            if type(other) == "number" then
+                return val + other
+            elseif other.rows == self.rows and other.columns == 1 then
+                return val + other[r][1]
+            elseif other.columns == self.columns and other.rows == 1 then
+                return val + other[1][c]
+            elseif other.rows == self.rows or other.columns == self.columns then
+                return val + other[r][c]
+            else
+                error("Invalid Argument! Takes a scalar value, a vector matrix or another matrix of the same dimensions!")
             end
-        end
-        return from2DArray(m)
+        end)
     end,
 
     --- Subtracts two matrices, or subtracts a scalar from all elements.
@@ -213,24 +289,20 @@ local matrix = {
         if type(self) == "number" then
             return other * self
         end
-        local m = {}
-        for r = 1, self.rows do
-            m[r] = {}
-            if type(other) == "number" then
-                for c = 1, self.columns do
-                    m[r][c] = self[r][c] * other
+
+        if type(other) == "number" then
+            return new(self.rows, self.columns, function(r, c) return self[r][c] * other end)
+        elseif type(other) == "table" and self.columns == other.rows then
+            return new(self.rows, other.columns, function(r, c)
+                local sum = 0
+                for k = 1, self.columns do
+                    sum = sum + self[r][k] * other[k][c]
                 end
-            elseif type(other) == "table" and self.rows == other.columns then
-                for c = 1, other.columns do
-                    for k = 1, self.columns do
-                        m[r][c] = (m[r][c] or 0) + self[r][k] * other[k][c]
-                    end
-                end
-            else
-                error("Invalid Argument! Takes a scalar value or another matrix whose columns equal the first matrix's number of rows!")
-            end
+                return sum
+            end)
+        else
+            error("Invalid Argument! Takes a scalar value or another matrix whose columns equal the first matrix's number of rows!")
         end
-        return from2DArray(m)
     end,
 
     --- Divides a matrix by a scalar or another matrix.
@@ -267,14 +339,7 @@ local matrix = {
     -- @usage m:unm()
     -- @usage -m
     unm = function(self)
-        local m = {}
-        for r = 1, self.rows do
-            m[r] = {}
-            for c = 1, self.columns do
-                m[r][c] = -self[r][c]
-            end
-        end
-        return from2DArray(m)
+        return self * -1
     end,
 
     --- Raises a square matrix to a non-negative integer power.
@@ -295,14 +360,7 @@ local matrix = {
         end
 
         if n == 0 then
-            local m = {}
-            for r = 1, self.rows do
-                m[r] = {}
-                for c = 1, self.columns do
-                    m[r][c] = (r == c) and 1 or 0
-                end
-            end
-            return from2DArray(m)
+            return identity(self.rows, self.columns)
         end
 
         local result = self
@@ -385,22 +443,11 @@ local matrix = {
             error("Row and column indices must be within matrix bounds!")
         end
 
-        local m = {}
-        local minor_row = 1
-        for r = 1, self.rows do
-            if r ~= row then
-                m[minor_row] = {}
-                local minor_col = 1
-                for c = 1, self.columns do
-                    if c ~= column then
-                        m[minor_row][minor_col] = self[r][c]
-                        minor_col = minor_col + 1
-                    end
-                end
-                minor_row = minor_row + 1
-            end
-        end
-        return from2DArray(m)
+        return new(self.rows - 1, self.columns - 1, function(r, c)
+            local src_r = r >= row and r + 1 or r
+            local src_c = c >= column and c + 1 or c
+            return self[src_r][src_c]
+        end)
     end,
 
     --- Computes the determinant of a square matrix.
@@ -434,14 +481,7 @@ local matrix = {
     -- @treturn Matrix The resulting transposed matrix
     -- @usage m:transpose()
     transpose = function(self)
-        local m = {}
-        for c = 1, self.columns do
-            m[c] = {}
-            for r = 1, self.rows do
-                m[c][r] = self[r][c]
-            end
-        end
-        return from2DArray(m)
+        return new(self.columns, self.rows, function(r, c) return self[c][r] end)
     end,
 
     --- Computes the cofactor matrix.
@@ -454,17 +494,11 @@ local matrix = {
             error("Must be a square matrix to calculate cofactor matrix!")
         end
 
-        local m = {}
-        for r = 1, self.rows do
-            m[r] = {}
-            for c = 1, self.columns do
-                local sign = ((-1) ^ (r + c))
-                local minor_det = self:minor(r, c):determinant()
-                m[r][c] = sign * minor_det
-            end
-        end
-
-        return from2DArray(m)
+        return new(self.rows, self.columns, function(r, c)
+            local sign = ((-1) ^ (r + c))
+            local minor_det = self:minor(r, c):determinant()
+            return sign * minor_det
+        end)
     end,
 
     --- Computes the adjugate (adjoint) matrix.
@@ -573,8 +607,8 @@ local matrix = {
     --
     -- @tparam Matrix self The matrix to measure
     -- @treturn number The Frobenius norm
-    -- @usage m:frobenius_norm()
-    frobenius_norm = function(self)
+    -- @usage m:frobeniusNorm()
+    frobeniusNorm = function(self)
         local sum = 0
         for r = 1, self.rows do
             for c = 1, self.columns do
@@ -588,8 +622,8 @@ local matrix = {
     --
     -- @tparam Matrix self The matrix to measure
     -- @treturn number The max norm
-    -- @usage m:max_norm()
-    max_norm = function(self)
+    -- @usage m:maxNorm()
+    maxNorm = function(self)
         local max_val = 0
         for r = 1, self.rows do
             for c = 1, self.columns do
@@ -604,8 +638,8 @@ local matrix = {
     -- @tparam Matrix self The first matrix
     -- @tparam Matrix other The second matrix (must have same dimensions)
     -- @treturn Matrix The resulting matrix
-    -- @usage m1:hadamard_product(m2)
-    hadamard_product = function(self, other)
+    -- @usage m1:hadamardProduct(m2)
+    hadamardProduct = function(self, other)
         expect(1, self, "table")
         if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
         expect(2, other, "table")
@@ -614,14 +648,8 @@ local matrix = {
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise multiplication!")
         end
-        local m = {}
-        for r = 1, self.rows do
-            m[r] = {}
-            for c = 1, self.columns do
-                m[r][c] = self[r][c] * other[r][c]
-            end
-        end
-        return from2DArray(m)
+
+        return new(self.rows, self.columns, function(r, c) return self[r][c] * other[r][c] end)
     end,
 
     --- Computes element-wise division.
@@ -629,8 +657,8 @@ local matrix = {
     -- @tparam Matrix self The numerator matrix
     -- @tparam Matrix other The denominator matrix (must have same dimensions)
     -- @treturn Matrix The resulting matrix
-    -- @usage m1:elementwise_div(m2)
-    elementwise_div = function(self, other)
+    -- @usage m1:elementwiseDiv(m2)
+    elementwiseDiv = function(self, other)
         expect(1, self, "table")
         if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
         expect(2, other, "table")
@@ -640,42 +668,27 @@ local matrix = {
             error("Matrices must have same dimensions for element-wise division!")
         end
 
-        local m = {}
-        for r = 1, other.rows do
-            m[r] = {}
-            for c = 1, other.columns do
-                m[r][c] = 1 / other[r][c]
-            end
-        end
-
-        return self:hadamard_product(from2DArray(m))
+        return self:hadamardProduct(new(other.rows, other.columns, function(r, c) return 1 / other[r][c] end))
     end,
 
     --- Checks if the matrix is symmetric.
     --
     -- @tparam Matrix self The matrix to test
     -- @treturn boolean True if the matrix equals its transpose
-    -- @usage m:is_symmetric()
-    is_symmetric = function(self)
+    -- @usage m:isSymmetric()
+    isSymmetric = function(self)
         if self.rows ~= self.columns then
             return false
         end
-        for r = 1, self.rows do
-            for c = r + 1, self.columns do
-                if math.abs(self[r][c] - self[c][r]) > 1e-10 then
-                    return false
-                end
-            end
-        end
-        return true
+        return self:equals(self:transpose())
     end,
 
     --- Checks if the matrix is diagonal.
     --
     -- @tparam Matrix self The matrix to test
     -- @treturn boolean True if all off-diagonal elements are zero
-    -- @usage m:is_diagonal()
-    is_diagonal = function(self)
+    -- @usage m:isDiagonal()
+    isDiagonal = function(self)
         if self.rows ~= self.columns then
             return false
         end
@@ -693,17 +706,12 @@ local matrix = {
     --
     -- @tparam Matrix self The matrix to test
     -- @treturn boolean True if the matrix is diagonal with all ones on the diagonal
-    -- @usage m:is_identity()
-    is_identity = function(self)
-        if not self:is_diagonal() then
+    -- @usage m:isIdentity()
+    isIdentity = function(self)
+        if not self:isDiagonal() then
             return false
         end
-        for i = 1, self.rows do
-            if math.abs(self[i][i] - 1) > 1e-10 then
-                return false
-            end
-        end
-        return true
+        return self:equals(identity(self.rows, self.columns))
     end,
 
     --- Returns a copy of this matrix, with the same data.
@@ -713,6 +721,276 @@ local matrix = {
     -- @usage m2 = m1:clone()
     clone = function(self)
         return new(self.rows, self.columns, function(r, c) return self[r][c] end)
+    end,
+
+    --- Performs LU decomposition using partial pivoting.
+    --
+    -- @tparam Matrix self The matrix to decompose
+    -- @treturn Matrix L The lower triangular matrix
+    -- @treturn Matrix U The upper triangular matrix
+    -- @treturn table P The permutation array (indices of row swaps)
+    -- @usage L, U, P = m:luDecomposition()
+    luDecomposition = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        if self.rows ~= self.columns then
+            error("Matrix must be square for LU decomposition!")
+        end
+
+        local n = self.rows
+        local U = self:clone()
+        local L = new(n, n, 0)
+        local P = {}
+        
+        for i = 1, n do
+            P[i] = i
+            L[i][i] = 1
+        end
+
+        for col = 1, n do
+            -- Find pivot
+            local maxVal, maxRow = math.abs(U[col][col]), col
+            for r = col + 1, n do
+                if math.abs(U[r][col]) > maxVal then
+                    maxVal = math.abs(U[r][col])
+                    maxRow = r
+                end
+            end
+
+            -- Swap rows in U and L
+            if maxRow ~= col then
+                U[col], U[maxRow] = U[maxRow], U[col]
+                for c = 1, col - 1 do
+                    L[col][c], L[maxRow][c] = L[maxRow][c], L[col][c]
+                end
+                P[col], P[maxRow] = P[maxRow], P[col]
+            end
+
+            if math.abs(U[col][col]) < 1e-10 then
+                error("Matrix is singular or nearly singular!")
+            end
+
+            -- Elimination
+            for r = col + 1, n do
+                local factor = U[r][col] / U[col][col]
+                L[r][col] = factor
+                for c = col, n do
+                    U[r][c] = U[r][c] - factor * U[col][c]
+                end
+            end
+        end
+
+        return L, U, P
+    end,
+
+    --- Converts a matrix to a 1D vector (flattened row-major order).
+    --
+    -- @tparam Matrix self The matrix to flatten
+    -- @treturn table A 1D array of all elements in row-major order
+    -- @usage v = m:flatten()
+    flatten = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        local result = {}
+        local idx = 1
+        for r = 1, self.rows do
+            for c = 1, self.columns do
+                result[idx] = self[r][c]
+                idx = idx + 1
+            end
+        end
+        return result
+    end,
+
+    --- Reshapes the matrix to new dimensions.
+    --
+    -- @tparam Matrix self The matrix to reshape
+    -- @tparam number rows New number of rows
+    -- @tparam number columns New number of columns
+    -- @treturn Matrix The reshaped matrix
+    -- @usage m2 = m1:reshape(2, 6)
+    reshape = function(self, rows, columns)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, rows, "number")
+        expect(3, columns, "number")
+
+        if self.rows * self.columns ~= rows * columns then
+            error("Cannot reshape: total elements must remain the same!")
+        end
+
+        local flat = self:flatten()
+        return new(rows, columns, function(r, c) return flat[(r - 1) * columns + c] end)
+    end,
+
+    --- Extracts a submatrix.
+    --
+    -- @tparam Matrix self The matrix to extract from
+    -- @tparam number r1 Starting row
+    -- @tparam number r2 Ending row
+    -- @tparam number c1 Starting column
+    -- @tparam number c2 Ending column
+    -- @treturn Matrix The submatrix
+    -- @usage sub = m:submatrix(1, 2, 1, 2)
+    submatrix = function(self, r1, r2, c1, c2)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, r1, "number")
+        expect(3, r2, "number")
+        expect(4, c1, "number")
+        expect(5, c2, "number")
+
+        if r1 < 1 or r2 > self.rows or c1 < 1 or c2 > self.columns or r1 > r2 or c1 > c2 then
+            error("Invalid submatrix bounds!")
+        end
+
+        return new(r2 - r1 + 1, c2 - c1 + 1, function(r, c) return self[r1 + r - 1][c1 + c - 1] end)
+    end,
+
+    --- Vertically stacks matrices (concatenates rows).
+    --
+    -- @tparam Matrix self First matrix
+    -- @tparam Matrix other Second matrix
+    -- @treturn Matrix The stacked matrix
+    -- @usage m3 = m1:vstack(m2)
+    vstack = function(self, other)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, other, "table")
+        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+
+        if self.columns ~= other.columns then
+            error("Matrices must have the same number of columns for vertical stacking!")
+        end
+
+        return new(self.rows + other.rows, self.columns, function(r, c)
+            if r <= self.rows then
+                return self[r][c]
+            else
+                return other[r - self.rows][c]
+            end
+        end)
+    end,
+
+    --- Horizontally stacks matrices (concatenates columns).
+    --
+    -- @tparam Matrix self First matrix
+    -- @tparam Matrix other Second matrix
+    -- @treturn Matrix The stacked matrix
+    -- @usage m3 = m1:hstack(m2)
+    hstack = function(self, other)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        expect(2, other, "table")
+        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+
+        if self.rows ~= other.rows then
+            error("Matrices must have the same number of rows for horizontal stacking!")
+        end
+
+        return new(self.rows, self.columns + other.columns, function(r, c)
+            if c <= self.columns then
+                return self[r][c]
+            else
+                return other[r][c - self.columns]
+            end
+        end)
+    end,
+
+    --- Computes the 1-norm (maximum absolute column sum).
+    --
+    -- @tparam Matrix self The matrix
+    -- @treturn number The 1-norm
+    -- @usage norm = m:oneNorm()
+    oneNorm = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        local max_col_sum = 0
+        for c = 1, self.columns do
+            local col_sum = 0
+            for r = 1, self.rows do
+                col_sum = col_sum + math.abs(self[r][c])
+            end
+            max_col_sum = math.max(max_col_sum, col_sum)
+        end
+        return max_col_sum
+    end,
+
+    --- Computes the 2-norm (spectral norm via power iteration).
+    --
+    -- @tparam Matrix self The matrix
+    -- @treturn number The 2-norm
+    -- @usage norm = m:twoNorm()
+    twoNorm = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        local n = self.columns
+        local v = new(n, 1, function() return math.random() end)
+        v = v / v:frobeniusNorm()
+
+        local prev_norm = 0
+        for i = 1, 100 do
+            local Av = self * v
+            local norm = Av:frobeniusNorm()
+            
+            if math.abs(norm - prev_norm) < 1e-10 then
+                return norm
+            end
+            
+            v = Av / norm
+            prev_norm = norm
+        end
+        return prev_norm
+    end,
+
+    --- Computes the infinity norm (maximum absolute row sum).
+    --
+    -- @tparam Matrix self The matrix
+    -- @treturn number The infinity norm
+    -- @usage norm = m:infinityNorm()
+    infinityNorm = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        local max_row_sum = 0
+        for r = 1, self.rows do
+            local row_sum = 0
+            for c = 1, self.columns do
+                row_sum = row_sum + math.abs(self[r][c])
+            end
+            max_row_sum = math.max(max_row_sum, row_sum)
+        end
+        return max_row_sum
+    end,
+
+    --- Computes the condition number.
+    --
+    -- @tparam Matrix self The matrix
+    -- @treturn number The condition number (>=1)
+    -- @usage cond = m:conditionNumber()
+    conditionNumber = function(self)
+        expect(1, self, "table")
+        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+
+        if self.rows ~= self.columns then
+            error("Condition number requires a square matrix!")
+        end
+
+        local norm_A = self:twoNorm()
+        local det = self:determinant()
+        
+        if math.abs(det) < 1e-15 then
+            return math.huge
+        end
+
+        local A_inv = self:inverse()
+        local norm_A_inv = A_inv:twoNorm()
+        
+        return norm_A * norm_A_inv
     end
 }
 

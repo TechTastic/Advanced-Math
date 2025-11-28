@@ -1,5 +1,5 @@
 using CCSharp.Attributes;
-using CCSharp.AdvancedMath;
+using CCSharp.ComputerCraft;
 
 namespace CCSharp.AdvancedMath;
 

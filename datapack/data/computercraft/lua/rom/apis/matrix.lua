@@ -8,7 +8,7 @@
 -- If you are interested in using [CCSharp][ccsharp], here is the compatible [Matrix.cs][ccsharp-matrix] file.
 --
 -- [ccsharp]: https://github.com/monkeymanboy/CCSharp
--- [ccsharp-matrix]: https://github.com/TechTastic/Advanced-Math/blob/main/CCSharp/src/CCSharp/AdvancedMath/Matrix.cs
+-- [ccsharp-matrix]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/Matrix.cs
 --
 -- @module matrix
 

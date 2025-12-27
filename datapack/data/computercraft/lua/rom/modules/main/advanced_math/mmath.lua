@@ -4,6 +4,11 @@
 --
 -- [wiki]: https://en.wikipedia.org/wiki/Linear_algebra
 --
+-- If you are interested in using [CCSharp][ccsharp], here is the compatible [MMath.cs][ccsharp-mmath] file.
+--
+-- [ccsharp]: https://github.com/monkeymanboy/CCSharp
+-- [ccsharp-mmath]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/MMath.cs
+--
 -- Credit goes to sans.9536 of the Minecraft Computer Mods discord for these functions and this file.
 --
 -- @module mmath

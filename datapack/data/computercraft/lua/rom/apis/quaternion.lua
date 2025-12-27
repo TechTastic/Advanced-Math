@@ -11,7 +11,7 @@
 -- If you are interested in using [CCSharp][ccsharp], here is the compatible [Quaternion.cs][ccsharp-quaternion] file.
 --
 -- [ccsharp]: https://github.com/monkeymanboy/CCSharp
--- [ccsharp-quaternion]: https://github.com/TechTastic/Advanced-Math/blob/main/CCSharp/src/CCSharp/AdvancedMath/Quaternion.cs
+-- [ccsharp-quaternion]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/Quaternion.cs
 --
 -- @module quaternion
 

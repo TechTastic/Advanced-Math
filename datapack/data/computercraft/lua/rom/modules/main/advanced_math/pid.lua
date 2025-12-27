@@ -5,62 +5,16 @@
 --
 -- [wiki]: https://en.wikipedia.org/wiki/Proportional-integral-derivative_controller
 --
+-- If you are interested in using [CCSharp][ccsharp], here is the compatible [PID.cs][ccsharp-pid] file.
+--
+-- [ccsharp]: https://github.com/monkeymanboy/CCSharp
+-- [ccsharp-pid]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/PID.cs
+--
 -- @module pid
 
 local expect = require "cc.expect"
 local expect = expect.expect
 local metatable
-
---- Constructors
---
--- @section Constructors
-
---- Constructs a new PID controller for either a scalar, vector, or quaternion target.
---
--- @tparam number|vector|quaternion target The setpoint to reach
--- @tparam number p Proportional gain - how aggressively to respond to the current error
--- @tparam number i Integral gain - how aggressively to eliminate accumulated error
--- @tparam number d Derivative gain - how aggressively to dampen the rate of change
--- @tparam boolean discrete Whether to treat the PID as discrete or continuous
--- @treturn The PID initialized with the given arguments
--- @usage pid = pid.new(target)
--- @export
--- @see quaternion
-function new(target, p, i, d, discrete)
-    expect(1, target, "table", "number")
-
-    if type(target) == "table" and getmetatable(target).__name ~= "vector" and getmetatable(target).__name ~= "quaternion" then
-        expect(1, target, "vector", "quaternion", "number")
-    end
-    expect(2, p, "number", "nil")
-    expect(3, i, "number", "nil")
-    expect(4, d, "number", "nil")
-    expect(5, discrete, "boolean", "nil")
-
-    local controller = {
-        sp = target or 1,
-        kp = p or 1,
-        ki = i or 0,
-        kd = d or 0,
-        discrete = discrete or true
-    }
-    if type(target) == "number" then
-        controller.step = scalarStep
-        controller.integral = 0
-        controller.prev_error = 0
-    elseif type(target) == "table" then
-        if vector and getmetatable(target).__name == "vector" then
-            controller.step = vectorStep
-            controller.integral = vector.new()
-            controller.prev_error = vector.new()
-        elseif quaternion then
-            controller.step = quaternionStep
-            controller.integral = vector.new()
-            controller.prev_error = vector.new()
-        end
-    end
-    return setmetatable(controller, metatable)
-end
 
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --
@@ -191,6 +145,57 @@ local function quaternionStep(self, value, dt)
         )
     end
     return output
+end
+
+--- Constructors
+--
+-- @section Constructors
+
+--- Constructs a new PID controller for either a scalar, vector, or quaternion target.
+--
+-- @tparam number|vector|quaternion target The setpoint to reach
+-- @tparam number p Proportional gain - how aggressively to respond to the current error
+-- @tparam number i Integral gain - how aggressively to eliminate accumulated error
+-- @tparam number d Derivative gain - how aggressively to dampen the rate of change
+-- @tparam boolean discrete Whether to treat the PID as discrete or continuous
+-- @treturn The PID initialized with the given arguments
+-- @usage pid = pid.new(target)
+-- @export
+-- @see quaternion
+function new(target, p, i, d, discrete)
+    expect(1, target, "table", "number")
+
+    if type(target) == "table" and getmetatable(target).__name ~= "vector" and getmetatable(target).__name ~= "quaternion" then
+        expect(1, target, "vector", "quaternion", "number")
+    end
+    expect(2, p, "number", "nil")
+    expect(3, i, "number", "nil")
+    expect(4, d, "number", "nil")
+    expect(5, discrete, "boolean", "nil")
+
+    local controller = {
+        sp = target or 1,
+        kp = p or 1,
+        ki = i or 0,
+        kd = d or 0,
+        discrete = discrete or true
+    }
+    if type(target) == "number" then
+        controller.step = scalarStep
+        controller.integral = 0
+        controller.prev_error = 0
+    elseif type(target) == "table" then
+        if vector and getmetatable(target).__name == "vector" then
+            controller.step = vectorStep
+            controller.integral = vector.new()
+            controller.prev_error = vector.new()
+        elseif quaternion then
+            controller.step = quaternionStep
+            controller.integral = vector.new()
+            controller.prev_error = vector.new()
+        end
+    end
+    return setmetatable(controller, metatable)
 end
 
 --- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.

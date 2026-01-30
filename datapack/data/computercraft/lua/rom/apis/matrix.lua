@@ -11,6 +11,7 @@
 -- [ccsharp-matrix]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/Matrix.cs
 --
 -- @module matrix
+-- @author TechTastic
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect
 local metatable

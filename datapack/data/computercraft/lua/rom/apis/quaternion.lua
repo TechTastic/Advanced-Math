@@ -14,6 +14,8 @@
 -- [ccsharp-quaternion]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/Quaternion.cs
 --
 -- @module quaternion
+-- @author TechTastic
+-- @author getItemFromBlock
 
 local expect = dofile("rom/modules/main/cc/expect.lua").expect
 local metatable

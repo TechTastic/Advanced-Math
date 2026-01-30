@@ -12,6 +12,7 @@
 -- Credit goes to sans.9536 of the Minecraft Computer Mods discord for these functions and this file.
 --
 -- @module mmath
+-- @author sans.9536
 
 local expect = require "cc.expect"
 local expect = expect.expect

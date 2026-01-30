@@ -11,6 +11,7 @@
 -- [ccsharp-pid]: https://github.com/monkeymanboy/CCSharp/blob/master/src/CCSharp/AdvancedMath/PID.cs
 --
 -- @module pid
+-- @author TechTastic
 
 local expect = require "cc.expect"
 local expect = expect.expect

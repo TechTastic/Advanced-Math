@@ -14,6 +14,8 @@ This project provides a few generic advanced mathematics libraries for CC: Tweak
 
 - [**Linear ALgebra Solvers**](https://techtastic.github.io/Advanced-Math/modules/mmath.html)  
 
+- [**Statistical Analysis**](https://techtastic.github.io/Advanced-Math/modules/stats.html)  
+
 [Here](https://github.com/TechTastic/Advanced-Math) is the actual repository of this project.
 
 ## Installation
@@ -33,6 +35,8 @@ If you want specific library files, simply copy them into your in-game computer 
 `local pid = require "path/to/pid"`
 #### Linear Algebra Solvers
 `local mmath = require "path/to/mmath"`
+#### Statistical Analysis
+`local stats = require "path/to/stats"`
 
 ## License
 

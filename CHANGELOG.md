@@ -1,2 +1,2 @@
-# Changelog - 0.3.3
-- Fixing silly negated equality issue in `quaternion`
+# Changelog - 0.3.4
+- Fixing error in `quaternion.tostring`

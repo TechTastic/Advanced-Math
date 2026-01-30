@@ -336,7 +336,7 @@ local quaternion = {
         else
             str = str .. " - "
         end
-        return str .. tostring(math.abs(self.v.y)) .. "k"
+        return str .. tostring(math.abs(self.v.z)) .. "k"
     end,
 
     --- Determines if the given quaternions are equal.

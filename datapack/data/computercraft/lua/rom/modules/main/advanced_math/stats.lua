@@ -853,7 +853,7 @@ end
 -- Checks a dataset against it's linear regression
 -- @tparam number[] x independent variable values
 -- @tparam number[] y dependent variable values
--- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
+-- @treturn table results table with t (test statistic), df (degrees of freedom), p (p-value), slope, slopeSe, r2 (r-squared)
 function stats.linRegTTest(x, y)
     expect(1, x, "table")
     expect(2, y, "table")

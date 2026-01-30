@@ -9,6 +9,10 @@ local expect = require "cc.expect"
 local expect = expect.expect
 local stats = {}
 
+--- Basic Descriptive Statistics
+--
+-- @section basic_descriptive_statistics
+
 --- Computes the sum of numeric values in the dataset
 --
 -- @tparam number[] data sequential table of numbers
@@ -22,10 +26,6 @@ function stats.sum(data)
     end
     return s
 end
-
---- Basic Descriptive Statistics
---
--- @section basic_descriptive_statistics
 
 --- Computes the arithmetic mean (average) of the dataset
 --
@@ -788,7 +788,7 @@ end
 --
 -- @tparam number[] x first sample
 -- @tparam number[] y second sample
--- @tparam boolean equal_var assume equal variances (default true)
+-- @tparam boolean[opt=true] equal_var assume equal variances (default true)
 -- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
 function stats.twoSampleTTest(x, y, equal_var)
     expect(1, x, "table")

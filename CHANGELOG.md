@@ -1,2 +1,2 @@
-# Changelog - 0.3.0
-- Added `stats.lua` made and provided by **sans.9536** and modified by me
+# Changelog - 0.3.1
+- Internal refactoring for checking metatables

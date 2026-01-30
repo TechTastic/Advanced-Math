@@ -78,7 +78,7 @@ end
 -- @export
 function fromVector(v, row)
     expect(1, v, "vector")
-    if getmetatable(v) ~= getmetatable(vector.new()) then expect(1, v, "vector") end
+    if (getmetatable(v) or {}).__name ~= "vector" then expect(1, v, "vector") end
     expect(2, row, "boolean", "nil")
 
     row = row or true
@@ -105,7 +105,7 @@ function fromQuaternion(q)
         error("Quaternion API is not loaded!")
     end
     expect(1, q, "table")
-    if getmetatable(q).__name ~= "quaternion" then expect(1, v, "quaternion") end
+    if (getmetatable(q) or {}).__name ~= "quaternion" then expect(1, v, "quaternion") end
 
     q = q:normalize()
     local w = q.a

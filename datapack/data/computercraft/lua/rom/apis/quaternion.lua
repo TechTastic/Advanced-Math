@@ -33,7 +33,7 @@ local metatable
 -- @export
 function new(vec, w)
     expect(1, vec, "table", "nil")
-    if type(vec) == "table" and getmetatable(vec) ~= getmetatable(vector.new()) then expect(1, vec, "vector", "nil") end
+    if type(vec) == "table" and (getmetatable(vec) or {}).__name ~= "vector" then expect(1, vec, "vector", "nil") end
     expect(2, w, "number", "nil")
 
 	return setmetatable({
@@ -51,7 +51,7 @@ end
 -- @export
 function fromAxisAngle(axis, angle)
     expect(1, axis, "table", "nil")
-    if type(axis) == "table" and getmetatable(axis) ~= getmetatable(vector.new()) then expect(1, axis, "vector", "nil") end
+    if type(axis) == "table" and (getmetatable(axis) or {}).__name ~= "vector" then expect(1, axis, "vector", "nil") end
     expect(2, angle, "number", "nil")
 
     if not axis then
@@ -241,9 +241,9 @@ local quaternion = {
     -- @usage q * v
     mul = function(self, other)
         expect(1, self, "table", "number")
-        if type(self) == "table" and getmetatable(self) ~= vmetatable and getmetatable(self) ~= getmetatable(vector.new()) then expect(1, self, "quaternion", "vector", "number") end
+        if type(self) == "table" and getmetatable(self) ~= vmetatable and (getmetatable(self) or {}).__name ~= "vector" then expect(1, self, "quaternion", "vector", "number") end
         expect(2, other, "table", "number")
-        if type(other) == "table" and getmetatable(other) ~= vmetatable and getmetatable(other) ~= getmetatable(vector.new()) then expect(1, other, "quaternion", "vector", "number") end
+        if type(other) == "table" and getmetatable(other) ~= vmetatable and (getmetatable(other) or {}).__name ~= "vector" then expect(1, other, "quaternion", "vector", "number") end
 
         if type(self) == "number" or getmetatable(self).__name == "vector" then
             return other * self

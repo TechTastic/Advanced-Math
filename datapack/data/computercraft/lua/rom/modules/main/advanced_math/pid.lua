@@ -65,7 +65,7 @@ end
 -- @local
 local function vectorStep(self, value, dt)
     expect(1, value, "table")
-    if getmetatable(value) ~= getmetatable(vector.new()) then expect(1, value, "vector") end
+    if (getmetatable(value) or {}).__name ~= "vector" then expect(1, value, "vector") end
     expect(2, dt, "number", "nil")
     dt = dt or 1
 
@@ -112,7 +112,7 @@ end
 -- @see quaternion
 local function quaternionStep(self, value, dt)
     expect(1, value, "table")
-    if getmetatable(value).__name ~= "quaternion" then expect(1, value, "quaternion") end
+    if (getmetatable(value) or {}).__name ~= "quaternion" then expect(1, value, "quaternion") end
     expect(2, dt, "number", "nil")
     dt = dt or 1
 
@@ -166,7 +166,8 @@ end
 function new(target, p, i, d, discrete)
     expect(1, target, "table", "number")
 
-    if type(target) == "table" and getmetatable(target).__name ~= "vector" and getmetatable(target).__name ~= "quaternion" then
+    local metatable = getmetatable(target) or {}
+    if type(target) == "table" and metatable.__name ~= "vector" and metatable.__name ~= "quaternion" then
         expect(1, target, "vector", "quaternion", "number")
     end
     expect(2, p, "number", "nil")
@@ -186,7 +187,7 @@ function new(target, p, i, d, discrete)
         controller.integral = 0
         controller.prev_error = 0
     elseif type(target) == "table" then
-        if vector and getmetatable(target).__name == "vector" then
+        if vector and metatable.__name == "vector" then
             controller.step = vectorStep
             controller.integral = vector.new()
             controller.prev_error = vector.new()

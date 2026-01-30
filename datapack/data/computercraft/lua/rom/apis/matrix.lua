@@ -145,9 +145,9 @@ end
 -- @export
 function solve(A, b, tol)
     expect(1, A, "table")
-    if getmetatable(A).__name ~= "matrix" then expect(1, A, "matrix") end
+    if (getmetatable(A) or {}).__name ~= "matrix" then expect(1, A, "matrix") end
     expect(2, b, "table")
-    if getmetatable(b).__name ~= "matrix" then expect(1, b, "matrix") end
+    if (getmetatable(b) or {}).__name ~= "matrix" then expect(2, b, "matrix") end
     expect(3, tol, "number", "nil")
     tol = tol or 1e-10
 
@@ -236,9 +236,9 @@ local matrix = {
     -- @usage m + 5
     add = function(self, other)
         expect(1, self, "table", "number")
-        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        if type(self) == "table" and (getmetatable(self) or {}).__name ~= "matrix" then expect(1, self, "matrix", "number") end
         expect(2, other, "table", "number")
-        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
+        if type(other) == "table" and (getmetatable(other) or {}).__name ~= "matrix" then expect(2, other, "matrix", "number") end
 
         if type(self) == "number" then
             return other + self
@@ -283,9 +283,9 @@ local matrix = {
     -- @usage m1 * m2
     mul = function(self, other)
         expect(1, self, "table", "number")
-        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        if type(self) == "table" and (getmetatable(self) or {}).__name ~= "matrix" then expect(1, self, "matrix", "number") end
         expect(2, other, "table", "number")
-        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
+        if type(other) == "table" and (getmetatable(other) or {}).__name ~= "matrix" then expect(2, other, "matrix", "number") end
 
         if type(self) == "number" then
             return other * self
@@ -318,18 +318,16 @@ local matrix = {
     -- @usage m1 / m2
     div = function(self, other)
         expect(1, self, "table", "number")
-        if type(self) == "table" and getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix", "number") end
+        if type(self) == "table" and (getmetatable(self) or {}).__name ~= "matrix" then expect(1, self, "matrix", "number") end
         expect(2, other, "table", "number")
-        if type(other) == "table" and getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix", "number") end
+        if type(other) == "table" and (getmetatable(other) or {}).__name ~= "matrix" then expect(2, other, "matrix", "number") end
 
         if type(self) == "number" then
-            return self * other:inverse()
+            return other:inverse() * self
         elseif type(other) == "number" then
             return self * (1 / other)
-        elseif type(other) == "table" then
-            return self * other:inverse()
         else
-            error("Invalid Argument! Takes a scalar value or another square matrix!")
+            return self * other:inverse()
         end
     end,
 
@@ -411,9 +409,9 @@ local matrix = {
     -- @usage m1 == m2
     equals = function(self, other)
         expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
+        if (getmetatable(self) or {}).__name ~= "matrix" then expect(1, self, "matrix") end
         expect(2, other, "table")
-        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+        if (getmetatable(other) or {}).__name ~= "matrix" then expect(2, other, "matrix") end
 
         if type(self) == type(other) and self.rows == other.rows and self.columns == other.columns then
             local identical = true
@@ -641,10 +639,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:hadamardProduct(m2)
     hadamardProduct = function(self, other)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, other, "table")
-        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+        expect(1, other, "table")
+        if (getmetatable(other) or {}).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise multiplication!")
@@ -660,10 +656,8 @@ local matrix = {
     -- @treturn Matrix The resulting matrix
     -- @usage m1:elementwiseDiv(m2)
     elementwiseDiv = function(self, other)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, other, "table")
-        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+        expect(1, other, "table")
+        if (getmetatable(other) or {}).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.rows ~= other.rows or self.columns ~= other.columns then
             error("Matrices must have same dimensions for element-wise division!")
@@ -732,9 +726,6 @@ local matrix = {
     -- @treturn table P The permutation array (indices of row swaps)
     -- @usage L, U, P = m:luDecomposition()
     luDecomposition = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         if self.rows ~= self.columns then
             error("Matrix must be square for LU decomposition!")
         end
@@ -791,9 +782,6 @@ local matrix = {
     -- @treturn table A 1D array of all elements in row-major order
     -- @usage v = m:flatten()
     flatten = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         local result = {}
         local idx = 1
         for r = 1, self.rows do
@@ -813,10 +801,8 @@ local matrix = {
     -- @treturn Matrix The reshaped matrix
     -- @usage m2 = m1:reshape(2, 6)
     reshape = function(self, rows, columns)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, rows, "number")
-        expect(3, columns, "number")
+        expect(1, rows, "number")
+        expect(2, columns, "number")
 
         if self.rows * self.columns ~= rows * columns then
             error("Cannot reshape: total elements must remain the same!")
@@ -836,12 +822,10 @@ local matrix = {
     -- @treturn Matrix The submatrix
     -- @usage sub = m:submatrix(1, 2, 1, 2)
     submatrix = function(self, r1, r2, c1, c2)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, r1, "number")
-        expect(3, r2, "number")
-        expect(4, c1, "number")
-        expect(5, c2, "number")
+        expect(1, r1, "number")
+        expect(2, r2, "number")
+        expect(3, c1, "number")
+        expect(4, c2, "number")
 
         if r1 < 1 or r2 > self.rows or c1 < 1 or c2 > self.columns or r1 > r2 or c1 > c2 then
             error("Invalid submatrix bounds!")
@@ -857,10 +841,8 @@ local matrix = {
     -- @treturn Matrix The stacked matrix
     -- @usage m3 = m1:vstack(m2)
     vstack = function(self, other)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, other, "table")
-        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+        expect(1, other, "table")
+        if (getmetatable(other) or {}).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.columns ~= other.columns then
             error("Matrices must have the same number of columns for vertical stacking!")
@@ -882,10 +864,8 @@ local matrix = {
     -- @treturn Matrix The stacked matrix
     -- @usage m3 = m1:hstack(m2)
     hstack = function(self, other)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-        expect(2, other, "table")
-        if getmetatable(other).__name ~= "matrix" then expect(1, other, "matrix") end
+        expect(1, other, "table")
+        if (getmetatable(other) or {}).__name ~= "matrix" then expect(1, other, "matrix") end
 
         if self.rows ~= other.rows then
             error("Matrices must have the same number of rows for horizontal stacking!")
@@ -906,9 +886,6 @@ local matrix = {
     -- @treturn number The 1-norm
     -- @usage norm = m:oneNorm()
     oneNorm = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         local max_col_sum = 0
         for c = 1, self.columns do
             local col_sum = 0
@@ -926,9 +903,6 @@ local matrix = {
     -- @treturn number The 2-norm
     -- @usage norm = m:twoNorm()
     twoNorm = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         local n = self.columns
         local v = new(n, 1, function() return math.random() end)
         v = v / v:frobeniusNorm()
@@ -954,9 +928,6 @@ local matrix = {
     -- @treturn number The infinity norm
     -- @usage norm = m:infinityNorm()
     infinityNorm = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         local max_row_sum = 0
         for r = 1, self.rows do
             local row_sum = 0
@@ -974,9 +945,6 @@ local matrix = {
     -- @treturn number The condition number (>=1)
     -- @usage cond = m:conditionNumber()
     conditionNumber = function(self)
-        expect(1, self, "table")
-        if getmetatable(self).__name ~= "matrix" then expect(1, self, "matrix") end
-
         if self.rows ~= self.columns then
             error("Condition number requires a square matrix!")
         end

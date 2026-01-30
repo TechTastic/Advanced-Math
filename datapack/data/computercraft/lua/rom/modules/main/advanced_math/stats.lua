@@ -56,31 +56,32 @@ function stats.max(data)
     return data[#data]
 end
 
---- Computes population variance by default. Set `is_sample` to true for sample variance
+--- Computes population variance by default.
 --
+-- Set `isSample` to true for sample variance.
 -- @tparam number[] data
--- @tparam[opt=false] boolean is_sample true to compute sample variance (divide by n-1)
+-- @tparam[opt=false] boolean isSample true to compute sample variance (divide by n-1)
 -- @treturn number|nil variance or nil if not defined
-function stats.variance(data, is_sample)
+function stats.variance(data, isSample)
     expect(1, data, "table")
-    if is_sample ~= nil then expect(2, is_sample, "boolean") end
+    if is_sample ~= nil then expect(2, isSample, "boolean") end
     if #data == 0 then return nil end
-    local sum_sq = 0
+    local sumSq = 0
     for _, v in pairs(data) do
-        sum_sq = sum_sq + (v - stats.mean(data)) ^ 2
+        sumSq = sumSq + (v - stats.mean(data)) ^ 2
     end
-    local denom = (is_sample and #data - 1 or #data)
+    local denom = (isSample and #data - 1 or #data)
     if denom <= 0 then return nil end
-    return sum_sq / denom
+    return sumSq / denom
 end
 
 --- Computes the standard deviation of the dataset using sample variance
 --
 -- @tparam number[] data
--- @tparam[opt=false] boolean is_sample true to compute sample stdev
+-- @tparam[opt=false] boolean isSample true to compute sample stdev
 -- @treturn number|nil standard deviation or nil if not defined
-function stats.stdev(data, is_sample)
-    local v = stats.variance(data, is_sample)
+function stats.stdev(data, isSample)
+    local v = stats.variance(data, isSample)
     return v and math.sqrt(v) or nil
 end
 
@@ -102,8 +103,8 @@ function stats.range(data)
 end
 
 --- Computes the median (50th percentile)
--- If even length, returns average of the two middle values
 --
+-- If even length, returns average of the two middle values
 -- @tparam number[] data
 -- @treturn number|nil median or nil if empty
 function stats.median(data)
@@ -148,8 +149,7 @@ function stats.mode(data)
     return modes
 end
 
---- Computes the standard error of the mean (commonly called SE)
--- Indicates precision
+--- Computes the standard error of the mean (commonly called SE) indicating precision
 --
 -- @tparam number[] data
 -- @treturn number|nil standard error or nil if undefined
@@ -157,8 +157,8 @@ function stats.sex(data)
     return #data > 0 and stats.stdev(data, true) / math.sqrt(#data) or nil
 end
 --- Computes the asymmetry (skewness) of data around its mean
--- Requires at least 3 observations
 --
+-- Requires at least 3 observations
 -- @tparam number[] data
 -- @treturn number|nil skewness or nil if undefined
 function stats.skewness(data)
@@ -175,8 +175,8 @@ function stats.skewness(data)
 end
 
 --- Computes the messure of skew (kurtosis) using an excess kurtosis formula variant
--- Requires at least 4 observations and indicates how much peak or tail a distribution would have
 --
+-- Requires at least 4 observations and indicates how much peak or tail a distribution would have
 -- @tparam number[] data
 -- @treturn number|nil kurtosis or nil if undefined
 function stats.kurtosis(data)
@@ -198,12 +198,13 @@ end
 -- @section alternative_means
 
 --- Computes the geometric mean
--- Only defined for strictly positive values
--- Useful for multiplicative rates such as combining percentage growth rates
 --
+-- Only defined for strictly positive values
+--
+-- Useful for multiplicative rates such as combining percentage growth rates
 -- @tparam number[] data
 -- @treturn number|nil geometric mean or nil if any value <= 0 or data empty
-function stats.geometric_mean(data)
+function stats.geometricMean(data)
     expect(1, data, "table")
     local prod, n = 1, #data
     if n == 0 then return nil end
@@ -216,11 +217,11 @@ function stats.geometric_mean(data)
 end
 
 --- Computes the harmonic mean
--- Best used for average rates and ratios, or inverse proportionalities
 --
+-- Best used for average rates and ratios, or inverse proportionalities
 -- @tparam number[] data
 -- @treturn number|nil harmonic mean or nil if any value == 0 or data empty
-function stats.harmonic_mean(data)
+function stats.harmonicMean(data)
     expect(1, data, "table")
     local sumr, n = 0, #data
     if n == 0 then return nil end
@@ -233,13 +234,14 @@ function stats.harmonic_mean(data)
 end
 
 --- Computes the trimmed mean
--- Removes `trim` fraction from each tail and averages the rest
--- Much more reliable measure of central tendency, clamps down outliers by removing a percentage of extremes
 --
+-- Removes `trim` fraction from each tail and averages the rest
+--
+-- Much more reliable measure of central tendency, clamps down outliers by removing a percentage of extremes
 -- @tparam number[] data
 -- @tparam[opt=0.05] number trim fraction to trim from each tail
 -- @treturn number|nil trimmed mean or nil if undefined
-function stats.trimmed_mean(data, trim)
+function stats.trimmedMean(data, trim)
     if trim ~= nil then
         expect(2, trim, "number")
         if math.abs(trim) ~= trim then
@@ -263,13 +265,14 @@ function stats.trimmed_mean(data, trim)
 end
 
 --- Computes the winsorized mean
--- Clamps extreme values to given quantiles before averaging
--- Much more reliable measure of central tendency
 --
+-- Clamps extreme values to given quantiles before averaging
+--
+-- Much more reliable measure of central tendency
 -- @tparam number[] data
 -- @tparam[opt=0.05] number alpha fraction to winsorize in each tail
 -- @treturn number|nil winsorized mean or nil if empty
-function stats.winsor_mean(data, alpha)
+function stats.winsorMean(data, alpha)
     if alpha ~= nil then
         expect(2, alpha, "number")
         if math.abs(alpha) ~= alpha then
@@ -286,14 +289,14 @@ function stats.winsor_mean(data, alpha)
 
     local lower = math.floor(alpha * n) + 1
     local upper = math.ceil((1 - alpha) * n)
-    local winsor_t = { table.unpack(t) }
+    local winsorT = { table.unpack(t) }
 
-    local lower_bound = t[lower]
-    local upper_bound = t[upper]
-    for i = 1, lower - 1 do winsor_t[i] = lower_bound end
-    for i = upper + 1, n do winsor_t[i] = upper_bound end
+    local lowerBound = t[lower]
+    local upperBound = t[upper]
+    for i = 1, lower - 1 do winsorT[i] = lowerBound end
+    for i = upper + 1, n do winsorT[i] = upperBound end
 
-    return stats.mean(winsor_t)
+    return stats.mean(winsorT)
 end
 
 --- Computes the weighted mean
@@ -301,7 +304,7 @@ end
 -- @tparam number[] data
 -- @tparam number[] weights same length as data
 -- @treturn number|nil weighted mean or nil if lengths mismatch or zero total weight
-function stats.weighted_mean(data, weights)
+function stats.weightedMean(data, weights)
     expect(1, data, "table")
     expect(2, weights, "table")
     local n = #data
@@ -321,11 +324,11 @@ end
 -- @section robust_statistics
 
 --- Computes the median absolute deviation (MAD)
--- Much more reliable measure of variability when outliers are present, from the deviation
 --
+-- Much more reliable measure of variability when outliers are present, from the deviation
 -- @tparam number[] data
 -- @treturn number|nil MAD or nil if empty
-function stats.mad_median(data)
+function stats.madMedian(data)
     if #data == 0 then return nil end
     local med = stats.median(data)
     local devs = {}
@@ -341,9 +344,10 @@ end
 -- @section inequality_measures
 
 --- Computes the gini coefficient for inequality (0..1)
--- Returns 0 for datasets with fewer than 2 or zero mean
--- Represents how unequally distributed a dataset it, best explained by income but works for other sets too
 --
+-- Returns 0 for datasets with fewer than 2 or zero mean
+--
+-- Represents how unequally distributed a dataset it, best explained by income but works for other sets too
 -- @tparam number[] data
 -- @treturn number gini coefficient (0..1)
 function stats.gini(data)
@@ -352,8 +356,8 @@ function stats.gini(data)
     if n < 2 then return 0 end
     local t = { table.unpack(data) }
     table.sort(t)
-    local mean_val = stats.mean(t)
-    if not mean_val or mean_val == 0 then return 0 end
+    local mean = stats.mean(t)
+    if not mean or mean == 0 then return 0 end
 
     local cumsum = 0
     for i = 1, n do
@@ -373,8 +377,8 @@ end
 -- @section bivariate_statistics
 
 --- Computes the sample covariance (uses n-1 denominator)
--- Represents how much the two datasets will vary with each other
 --
+-- Represents how much the two datasets will vary with each other
 -- @tparam number[] x
 -- @tparam number[] y
 -- @treturn number|nil covariance or nil if lengths mismatch or n<=1
@@ -395,9 +399,10 @@ function stats.covariance(x, y)
 end
 
 --- Computes the pearson correlation coefficient
--- Returns 0 if undefined
--- Represents the strength and relationship of the covariances, much more interpretable
 --
+-- Returns 0 if undefined
+--
+-- Represents the strength and relationship of the covariances, much more interpretable
 -- @tparam number[] x
 -- @tparam number[] y
 -- @treturn number correlation coefficient in [-1,1] or 0 if undefined
@@ -415,9 +420,10 @@ end
 -- @section quantiles_and_qutliers
 
 --- Computes the percentile interpolation (linear interpolation between order statistics)
--- Finds the percentile of a value p given a dataset, sorts and places in between indices(or on one)
--- p in [0,1]
 --
+-- Finds the percentile of a value p given a dataset, sorts and places in between indices(or on one)
+--
+-- p in [0,1]
 -- @tparam number[] data
 -- @tparam number p percentile proportion (0..1)
 -- @treturn number|nil percentile value or nil if data empty
@@ -443,8 +449,8 @@ function stats.percentile(data, p)
 end
 
 --- Computes the first and third quartiles as table (`{ Q1 = ..., Q3 = ... }`)
--- Quartiles are found by cutting the dataset in half using the median, and finding the median of those sets
 --
+-- Quartiles are found by cutting the dataset in half using the median, and finding the median of those sets
 -- @tparam number[] data
 -- @treturn table quartiles
 function stats.quartiles(data)
@@ -455,8 +461,8 @@ function stats.quartiles(data)
 end
 
 --- Computes the interquartile range Q3 - Q1
--- The distance between first and third quartiles
 --
+-- The distance between first and third quartiles
 -- @tparam number[] data
 -- @treturn number|nil IQR or nil if undefined
 function stats.iqr(data)
@@ -466,8 +472,8 @@ function stats.iqr(data)
 end
 
 --- Computes a list of all outliers in the dataset
--- Outliers are considered as such if they are more than 150% of the IQR away from either the first or third quartiles
 --
+-- Outliers are considered as such if they are more than 150% of the IQR away from either the first or third quartiles
 -- @tparam number[] data
 -- @treturn number[] list of outlier values (empty if none)
 function stats.outliers(data)
@@ -528,8 +534,8 @@ end
 -- @section linear_regression
 
 --- Computes a simple least-squares linear regression (y ~ a + b x)
--- Minimizes squares to find the line that is the least distance squared from all data points
 --
+-- Minimizes squares to find the line that is the least distance squared from all data points
 -- @tparam number[] x independent variable values
 -- @tparam number[] y dependent variable values
 -- @treturn table|nil `{ slope = number, intercept = number }` or nil if undefined
@@ -563,15 +569,15 @@ end
 function stats.linRegPred(model, xval)
     expect(1, model, "table")
     expect(2, xval, "number")
-    expect(1, model.slope, "number")
-    expect(1, model.intercept, "number")
+    expect(1, model.slope, "linear regression model")
+    expect(1, model.intercept, "linear regression model")
     if not model then return nil end
     return model.slope * xval + model.intercept
 end
 
 --- Computes the coefficient of determination R^2 for linear model
--- Represents how much variation in variable y can be attributed to variable x
 --
+-- Represents how much variation in variable y can be attributed to variable x
 -- @tparam number[] x
 -- @tparam number[] y
 -- @tparam table model linear model returned by linReg
@@ -580,8 +586,8 @@ function stats.r2(x, y, model)
     expect(1, x, "table")
     expect(2, y, "table")
     expect(3, model, "table")
-    expect(3, model.slope, "number")
-    expect(3, model.intercept, "number")
+    expect(3, model.slope, "linear regression model")
+    expect(3, model.intercept, "linear regression model")
     local n = #y
     if n == 0 or not model then return nil end
 
@@ -606,8 +612,8 @@ end
 -- @section hyposthesis_testing_students_t_distribution
 
 --- Calculate cumulative distribution function for Student's t distribution
--- Uses numerical approximation for the incomplete beta function using relationship to incomplete beta function and continued fraction approximation
 --
+-- Uses numerical approximation for the incomplete beta function using relationship to incomplete beta function and continued fraction approximation
 -- @tparam number t t-statistic value
 -- @tparam number df degrees of freedom
 -- @treturn number probability `P(T <= t)`
@@ -625,18 +631,18 @@ function stats.tCDF(t, df)
     local a = df / 2
     local b = 0.5
     
-    local beta_inc = stats.incopmleteBeta(x, a, b)
+    local betaInc = stats.incopmleteBeta(x, a, b)
     
     if t >= 0 then
-        return 1 - 0.5 * beta_inc
+        return 1 - 0.5 * betaInc
     else
-        return 0.5 * beta_inc
+        return 0.5 * betaInc
     end
 end
 
 --- Calculate normal (Gaussian) cumulative distribution function
--- Helper function for tCDF when df is large using error function approximation
 --
+-- Helper function for tCDF when df is large using error function approximation
 -- @tparam number x value
 -- @treturn number probability `P(X <= x)` for standard normal
 function stats.normalCDF(x)
@@ -662,8 +668,8 @@ function stats.normalCDF(x)
 end
 
 --- Calculate incomplete beta function I_x(a,b)
--- Helper function for tCDF calculation using continued fraction approximation
 --
+-- Helper function for tCDF calculation using continued fraction approximation
 -- @tparam number x upper limit of integration (0 <= x <= 1)
 -- @tparam number a first shape parameter
 -- @tparam number b second shape parameter
@@ -675,7 +681,7 @@ function stats.incopmleteBeta(x, a, b)
     if x < 0 or x > 1 then expect(1, x, "number between zero and one inclusive") end
     
     local function betaCF(x, a, b)
-        local max_iter = 200
+        local maxIter = 200
         local epsilon = 1e-10
         
         local qab = a + b
@@ -688,7 +694,7 @@ function stats.incopmleteBeta(x, a, b)
         d = 1 / d
         local h = d
         
-        for m = 1, max_iter do
+        for m = 1, maxIter do
             local m2 = 2 * m
             local aa = m * (b - m) * x / ((qam + m2) * (a + m2))
             d = 1 + aa * d
@@ -729,8 +735,8 @@ function stats.incopmleteBeta(x, a, b)
 end
 
 --- Calculate logarithm of gamma function
--- Helper function for incopmleteBeta using Lanczos approximation coefficients
 --
+-- Helper function for incopmleteBeta using Lanczos approximation coefficients
 -- @tparam number x input value
 -- @treturn number `log(Gamma(x))`
 function stats.logGamma(x)
@@ -762,9 +768,10 @@ end
 -- @section hypothesis_testing_t_tests
 
 --- Perform one-sample t-test
--- Tests whether sample mean significantly differs from a hypothesized population mean
--- Returns p-value: if p < 0.05, difference is statistically significant
 --
+-- Tests whether sample mean significantly differs from a hypothesized population mean
+--
+-- Returns p-value: if p < 0.05, difference is statistically significant
 -- @tparam number[] data sample values
 -- @tparam number mu0 hypothesized population mean
 -- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
@@ -783,22 +790,23 @@ function stats.oneSampleTTest(data, mu0)
 end
 
 --- Perform two-sample t-test
--- Tests whether means of two independent samples significantly differ
--- Returns p-value: if p < 0.05, difference is statistically significant
 --
+-- Tests whether means of two independent samples significantly differ
+--
+-- Returns p-value: if p < 0.05, difference is statistically significant
 -- @tparam number[] x first sample
 -- @tparam number[] y second sample
--- @tparam boolean[opt=true] equal_var assume equal variances (default true)
+-- @tparam boolean[opt=true] equalVar assume equal variances (default true)
 -- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
-function stats.twoSampleTTest(x, y, equal_var)
+function stats.twoSampleTTest(x, y, equalVar)
     expect(1, x, "table")
     expect(2, y, "table")
-    if equal_var ~= nil then expect(3, equal_var, "boolean") end
+    if equalVar ~= nil then expect(3, equalVar, "boolean") end
     local nx, ny = #x, #y
     if nx < 2 or ny < 2 then return {t = 0, df = 0, p = 1} end
     local mx, my = stats.mean(x), stats.mean(y)
     local vx, vy = stats.variance(x, true), stats.variance(y, true)
-    equal_var = equal_var ~= false
+    equalVar = equalVar ~= false
     
     local se, df
     if equal_var then
@@ -819,9 +827,10 @@ function stats.twoSampleTTest(x, y, equal_var)
 end
 
 --- Perform paired t-test
--- Tests whether the mean difference between paired observations is significant
--- Useful for before/after comparisons on the same subjects
 --
+-- Tests whether the mean difference between paired observations is significant
+--
+-- Useful for before/after comparisons on the same subjects
 -- @tparam number[] before values before treatment
 -- @tparam number[] after values after treatment
 -- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
@@ -840,8 +849,8 @@ function stats.pairTTest(before, after)
 end
 
 --- Perform t-test on linear regression slope
--- Checks a dataset against it's linear regression
 --
+-- Checks a dataset against it's linear regression
 -- @tparam number[] x independent variable values
 -- @tparam number[] y dependent variable values
 -- @treturn table results table with t (test statistic), df (degrees of freedom), and p (p-value)
@@ -852,7 +861,7 @@ function stats.linRegTTest(x, y)
     if not model then return {t = 0, df = 0, p = 1} end
     
     local n = #x
-    local slope_se = stats.stdev(y, true) / math.sqrt(stats.sum(function()
+    local slopeSe = stats.stdev(y, true) / math.sqrt(stats.sum(function()
         local mx = stats.mean(x)
         local sxx = 0
         for i = 1, n do
@@ -862,7 +871,7 @@ function stats.linRegTTest(x, y)
         return sxx
     end))
     
-    local t = model.slope / slope_se
+    local t = model.slope / slopeSe
     local df = n - 2
     local p = 2 * (1 - stats.tCDF(math.abs(t), df))
     
@@ -871,8 +880,8 @@ function stats.linRegTTest(x, y)
         df = df,
         p = p,
         slope = model.slope,
-        slope_se = slope_se,
-        r_squared = stats.r2(x, y, model)
+        slopeSe = slopeSe,
+        r2 = stats.r2(x, y, model)
     }
 end
 

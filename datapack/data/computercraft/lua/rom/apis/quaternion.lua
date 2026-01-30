@@ -243,9 +243,9 @@ local quaternion = {
         expect(1, self, "table", "number")
         if type(self) == "table" and (getmetatable(self) or {}).__name ~= "quaternion" and (getmetatable(self) or {}).__name ~= "vector" then expect(1, self, "quaternion", "vector", "number") end
         expect(2, other, "table", "number")
-        if type(other) == "table" and (getmetatable(other) or {}).__name ~= "quaternion" and (getmetatable(other) or {}).__name ~= "vector" then expect(1, other, "quaternion", "vector", "number") end
+        if type(other) == "table" and (getmetatable(other) or {}).__name ~= "quaternion" and (getmetatable(other) or {}).__name ~= "vector" then expect(2, other, "quaternion", "vector", "number") end
 
-        if type(self) == "number" or (getmetatable(self) or {}).__name ~= "vector" then
+        if type(self) == "number" or (getmetatable(self) or {}).__name == "vector" then
             return other * self
         end
 

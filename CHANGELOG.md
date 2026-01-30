@@ -1,2 +1,2 @@
-# Changelog - 0.3.2
-- More internal refactoring for checking metatables
+# Changelog - 0.3.3
+- Fixing silly negated equality issue in `quaternion`

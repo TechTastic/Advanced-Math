@@ -1,2 +1,2 @@
-# Changelog - 0.3.1
-- Internal refactoring for checking metatables
+# Changelog - 0.3.2
+- More internal refactoring for checking metatables

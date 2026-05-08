@@ -200,6 +200,34 @@ function new(target, p, i, d, discrete)
     return setmetatable(controller, metatable)
 end
 
+local function clampOutput(self, min, max)
+    expect(1, min, "number", "nil")
+    if min then
+        expect(2, max, "number")
+    else
+        expect(2, max, "nil")
+    end
+    if min >= max then
+        error("Invalid limits! Min must be less than max!")
+    end
+    self.output_min = min
+    self.output_max = max
+end
+
+local function limitIntegral(self, min, max)
+    expect(1, min, "number", "nil")
+    if min then
+        expect(2, max, "number")
+    else
+        expect(2, max, "nil")
+    end
+    if min >= max then
+        error("Invalid limits! Min must be less than max!")
+    end
+    self.integral_min = min
+    self.integral = max
+end
+
 --- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.
 --
 -- @type PID
@@ -238,42 +266,19 @@ local pid = {
 
     --- Enables/disables the clamping of the output value
     --
+    -- @function clampOutput
     -- @tparam PID self The PID instance
     -- @tparam number min The minimum clamp for the output
     -- @tparam number max The maximum clamp for the output
-    clampOutput = function(self, min, max)
-        expect(1, min, "number", "nil")
-        if min then
-            expect(2, max, "number")
-        else
-            expect(2, max, "nil")
-        end
-        if min >= max then
-            error("Invalid limits! Min must be less than max!")
-        end
-        self.output_min = min
-        self.output_max = max
-    end,
+    clampOutput = clampOutput,
 
     --- Enables/disables the integral limits for anti-windup
     --
+    -- @function limitIntegral
     -- @tparam PID self The PID instance
     -- @tparam number min The minimum limit for the integral
     -- @tparam number max The maximum limit for the integral
-    limitIntegral = function(self, min, max)
-        expect(1, min, "number", "nil")
-        if min then
-            expect(2, max, "number")
-        else
-            expect(2, max, "nil")
-        end
-        if min >= max then
-            error("Invalid limits! Min must be less than max!")
-        end
-        self.integral_min = min
-        self.integral = max
-    end,
-
+    limitIntegral = limitIntegral,
 
     --- Converts the PID instance into a human-readable string
     --

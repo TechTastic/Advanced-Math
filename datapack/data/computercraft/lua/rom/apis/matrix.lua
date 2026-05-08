@@ -77,7 +77,7 @@ end
 -- @usage m = matrix.fromVector(vector.new(1, 2, 3), false) -- column matrix
 -- @export
 function fromVector(v, row)
-    expect(1, v, "vector")
+    expect(1, v, "table")
     if (getmetatable(v) or {}).__name ~= "vector" then expect(1, v, "vector") end
     expect(2, row, "boolean", "nil")
 

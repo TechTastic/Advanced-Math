@@ -15,7 +15,7 @@
 
 local expect = require "cc.expect"
 local expect = expect.expect
-local metatable
+local pid_metatable
 
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --

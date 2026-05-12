@@ -15,7 +15,7 @@
 
 local expect = require "cc.expect"
 local expect = expect.expect
-local metatable
+local pid_metatable
 
 --- Performs a PID control step if the setpoint is a scalar (number) value
 --
@@ -197,7 +197,7 @@ function new(target, p, i, d, discrete)
             controller.prev_error = vector.new()
         end
     end
-    return setmetatable(controller, metatable)
+    return setmetatable(controller, pid_metatable)
 end
 
 local function clampOutput(self, min, max)
@@ -225,7 +225,7 @@ local function limitIntegral(self, min, max)
         error("Invalid limits! Min must be less than max!")
     end
     self.integral_min = min
-    self.integral = max
+    self.integral_max = max
 end
 
 --- A PID, with a scalar, vector, or quaternion setpoint, kP, kI, and kD, both as discrete and continuous.
@@ -291,7 +291,7 @@ local pid = {
     end
 }
 
-metatable = {
+pid_metatable = {
     __name = "PID",
     __index = pid,
     __tostring = pid.tostring

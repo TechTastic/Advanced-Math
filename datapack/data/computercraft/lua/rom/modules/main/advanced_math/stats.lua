@@ -278,7 +278,7 @@ function stats.winsorMean(data, alpha)
         if math.abs(alpha) ~= alpha then
             expect(2, alpha, "non-negative number")
         end
-        if alpha > 0.5 then execpt(2, alpha, "number less than or equal to 0.5")
+        if alpha > 0.5 then execpt(2, alpha, "number less than or equal to 0.5") end
     end
     alpha = alpha or 0.05
     local t = { table.unpack(data) }
@@ -519,7 +519,7 @@ function stats.testdata(n, a, b)
     expect(1, n, "number")
     expect(2, a, "number")
     expect(3, b, "number")
-    if n < 1 then expect(1, n, "number greater than or equal to one")
+    if n < 1 then expect(1, n, "number greater than or equal to one") end
     local result = {}
     a = a or 0
     b = b or 1
@@ -569,8 +569,8 @@ end
 function stats.linRegPred(model, xval)
     expect(1, model, "table")
     expect(2, xval, "number")
-    expect(1, model.slope, "linear regression model")
-    expect(1, model.intercept, "linear regression model")
+    expect(1, model.slope, "number")
+    expect(1, model.intercept, "number")
     if not model then return nil end
     return model.slope * xval + model.intercept
 end
@@ -586,8 +586,8 @@ function stats.r2(x, y, model)
     expect(1, x, "table")
     expect(2, y, "table")
     expect(3, model, "table")
-    expect(3, model.slope, "linear regression model")
-    expect(3, model.intercept, "linear regression model")
+    expect(3, model.slope, "number")
+    expect(3, model.intercept, "number")
     local n = #y
     if n == 0 or not model then return nil end
 
